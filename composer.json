@@ -1,0 +1,11 @@
+{
+    "name": "project/vehicle-manager",
+    "require": {
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
