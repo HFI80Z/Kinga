@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -6,42 +8,38 @@ use App\Config\Database;
 
 class AuthController extends Controller
 {
-    public function showLogin(): void
+    public function showLogin()
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
-        $error = $_SESSION['error'] ?? null;
+        $error = isset($_SESSION['error']) ? $_SESSION['error'] : null;
         unset($_SESSION['error']);
 
         $this->view('auth/login', ['error' => $error]);
     }
 
-    public function login(): void
+    public function login()
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
 
-        $email = $_POST['email']    ?? '';
-        $plain = $_POST['password'] ?? '';
+        $email = isset($_POST['email']) ? $_POST['email'] : '';
+        $plain = isset($_POST['password']) ? $_POST['password'] : '';
 
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare(
-            "SELECT id, email, role
+            "SELECT id, user_name, user_firstname, email, password, role
              FROM users
              WHERE email = :email
-               AND password = crypt(:plain, password)"
+             LIMIT 1"
         );
-        $stmt->execute([
-            ':email' => $email,
-            ':plain' => $plain,
-        ]);
-
+        $stmt->execute([':email' => $email]);
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        if ($user) {
-            // on ne stocke pas le mot de passe
+        if ($user && password_verify($plain, $user['password'])) {
+            unset($user['password']);  // on ne stocke pas le hash en session
             $_SESSION['user'] = $user;
             $this->redirect('/');
         }
@@ -50,37 +48,40 @@ class AuthController extends Controller
         $this->redirect('/login');
     }
 
-    public function showRegister(): void
+    public function showRegister()
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
-        $error = $_SESSION['error'] ?? null;
+        $error = isset($_SESSION['error']) ? $_SESSION['error'] : null;
         unset($_SESSION['error']);
 
         $this->view('auth/register', ['error' => $error]);
     }
 
-    public function register(): void
+    public function register()
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
 
-        $email    = $_POST['email']    ?? '';
-        $plain    = $_POST['password'] ?? '';
-        $role     = 'user';
+        $name  = isset($_POST['user_name'])      ? trim($_POST['user_name'])      : '';
+        $first = isset($_POST['user_firstname']) ? trim($_POST['user_firstname']) : '';
+        $email = isset($_POST['email'])          ? trim($_POST['email'])          : '';
+        $plain = isset($_POST['password'])       ? $_POST['password']             : '';
+        $role  = 'user';
 
-        // hasher le mot de passe en PHP
         $hash = password_hash($plain, PASSWORD_BCRYPT);
 
         try {
             $pdo = Database::getConnection();
-            $stmt = $pdo->prepare(
-                "INSERT INTO users (email, password, role)
-                 VALUES (:email, :pass, :role)"
-            );
+            $stmt = $pdo->prepare("
+                INSERT INTO users (user_name, user_firstname, email, password, role)
+                VALUES (:name, :first, :email, :pass, :role)
+            ");
             $stmt->execute([
+                ':name'  => $name,
+                ':first' => $first,
                 ':email' => $email,
                 ':pass'  => $hash,
                 ':role'  => $role,
@@ -90,8 +91,13 @@ class AuthController extends Controller
             $this->redirect('/register');
         }
 
-        // récupération de l’utilisateur pour la session
-        $stmt = $pdo->prepare("SELECT id, email, role FROM users WHERE email = :email");
+        // On récupère l’utilisateur pour la session
+        $stmt = $pdo->prepare("
+            SELECT id, user_name, user_firstname, email, role
+            FROM users
+            WHERE email = :email
+            LIMIT 1
+        ");
         $stmt->execute([':email' => $email]);
         $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -99,7 +105,7 @@ class AuthController extends Controller
         $this->redirect('/');
     }
 
-    public function logout(): void
+    public function logout()
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();

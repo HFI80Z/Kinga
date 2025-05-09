@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Liste des Véhicules</title>
-    <img src="/assets/img/user.png" alt="Avatar">
     <style>
       /* styles rapide pour le modal */
       #overlay {
@@ -31,14 +30,6 @@
       header { position: relative; padding-bottom: 1em; }
       header h1 { margin: 0; }
 
-      .status-bar {
-        background: #f5f5f5;
-        padding: 0.5em;
-        margin-bottom: 1em;
-        font-size: 0.9em;
-      }
-      .status-bar span { font-weight: bold; }
-
       .user-info {
         position: absolute;
         top: 0;
@@ -50,61 +41,57 @@
         width: 32px; height: 32px;
         margin-right: 0.5em;
       }
+      .user-info a {
+        margin-left: 1em;
+        text-decoration: none;
+        font-weight: bold;
+      }
 
-      .auth-buttons { margin: 1em 0; }
-      .auth-buttons a { margin-right: 0.5em; }
+      .auth-buttons {
+        margin: 1em 0;
+      }
+      .auth-buttons a {
+        margin-right: 0.5em;
+      }
     </style>
 </head>
 <body>
     <?php
     use App\Core\Auth;
-    // Session déjà lancée en public/index.php
-    $user = $_SESSION['user'] ?? null;
+    // La session est déjà démarrée dans public/index.php
+    $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
     ?>
-
-    <!-- barre de statut -->
-    <div class="status-bar">
-      <?php if ($user): ?>
-        Connecté en tant que <span><?= htmlspecialchars($user['user_firstname'] . ' ' . $user['user_name'], ENT_QUOTES) ?></span>
-      <?php else: ?>
-        <span>Non connecté</span>
-      <?php endif; ?>
-    </div>
 
     <header>
       <?php if ($user): ?>
         <div class="user-info">
           <img src="/assets/img/user.png" alt="Avatar">
-          <span><?= htmlspecialchars($user['user_firstname'] . ' ' . $user['user_name'], ENT_QUOTES) ?></span>
+          <span><?= htmlspecialchars($user['user_firstname'].' '.$user['user_name'], ENT_QUOTES) ?></span>
+          <a href="/logout">Déconnexion</a>
         </div>
       <?php endif; ?>
       <h1>Véhicules</h1>
     </header>
 
     <div class="auth-buttons">
-      <?php if (Auth::check()): ?>
-        <a href="/logout">Déconnexion</a>
-      <?php else: ?>
+      <?php if (! $user): ?>
         <a href="/login">Se connecter</a>
         <a href="/register">S'inscrire</a>
       <?php endif; ?>
     </div>
 
     <?php
-    // garantit un tableau de véhicules
-    $vehicles = $vehicles ?? [];
-    // marche de secours si aucun véhicule
+    // S’assurer qu’on a bien un tableau de véhicules
+    $vehicles = isset($vehicles) ? $vehicles : [];
     if (count($vehicles) === 0) {
-        $vehicles = [[
-            'id'            => 1,
-            'vehicle_plate' => 'XYZ-999',
-            'vehicle_type'  => 'BERLINE',
-            'vehicle_maker' => 'Toyota',
-            'vehicle_model' => 'Corolla',
-            'color'         => 'Bleu',
-            'nb_seats'      => 5,
-            'vehicle_km'    => 45000,
-        ]];
+        $vehicles = [
+            ['id'=>1,'vehicle_plate'=>'XYZ-999','vehicle_type'=>'BERLINE','vehicle_maker'=>'Toyota','vehicle_model'=>'Corolla','color'=>'Bleu','nb_seats'=>5,'vehicle_km'=>45000],
+            ['id'=>2,'vehicle_plate'=>'ABC-123','vehicle_type'=>'SUV','vehicle_maker'=>'Ford','vehicle_model'=>'Explorer','color'=>'Noir','nb_seats'=>7,'vehicle_km'=>32000],
+            ['id'=>3,'vehicle_plate'=>'DEF-456','vehicle_type'=>'HATCHBACK','vehicle_maker'=>'Renault','vehicle_model'=>'Clio','color'=>'Rouge','nb_seats'=>5,'vehicle_km'=>21000],
+            ['id'=>4,'vehicle_plate'=>'GHI-789','vehicle_type'=>'BERLINE','vehicle_maker'=>'Peugeot','vehicle_model'=>'208','color'=>'Gris','nb_seats'=>5,'vehicle_km'=>15000],
+            ['id'=>5,'vehicle_plate'=>'JKL-321','vehicle_type'=>'COUPÉ','vehicle_maker'=>'BMW','vehicle_model'=>'Z4','color'=>'Blanc','nb_seats'=>2,'vehicle_km'=>28000],
+            ['id'=>6,'vehicle_plate'=>'MNO-654','vehicle_type'=>'BREAK','vehicle_maker'=>'Audi','vehicle_model'=>'A4 Avant','color'=>'Vert','nb_seats'=>5,'vehicle_km'=>39000],
+        ];
     }
     ?>
 
@@ -159,8 +146,9 @@
       <h2>Détails du véhicule</h2>
       <dl id="modal-content"></dl>
       <button id="modal-close">Fermer</button>
-      <button id="modal-action">Modifier</button>
-      <?php if (Auth::check()): ?>
+
+      <?php if ($user && $user['role'] === 'admin'): ?>
+        <button id="modal-action">Modifier</button>
         <button id="modal-delete">Supprimer</button>
       <?php endif; ?>
     </div>
@@ -186,7 +174,9 @@
         `;
         overlay.style.display = modal.style.display = 'block';
 
-        action.onclick = () => alert('Modifier le véhicule ID ' + d.id);
+        if (action) {
+          action.onclick = () => alert('Modifier le véhicule ID ' + d.id);
+        }
         if (delBtn) {
           delBtn.onclick = () => {
             if (confirm('Confirmer la suppression du véhicule ID ' + d.id + ' ?')) {
