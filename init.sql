@@ -1,6 +1,3 @@
--- Exemple de script à ré-importer après le DROP/CREATE SCHEMA
-
--- Table users
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(100) UNIQUE NOT NULL,
@@ -9,11 +6,9 @@ CREATE TABLE users (
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- compte admin
 INSERT INTO users(email,password,role)
 VALUES ('admin@example.com','admin','admin');
 
--- Table vehicles
 CREATE TABLE vehicles (
   id SERIAL PRIMARY KEY,
   immatriculation VARCHAR(20) NOT NULL UNIQUE,
@@ -26,7 +21,6 @@ CREATE TABLE vehicles (
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Exemples
 INSERT INTO vehicles(immatriculation,type,fabricant,modele,couleur,nb_sieges,km)
 VALUES
   ('XYZ-999','BERLINE','Toyota','Corolla','Bleu',5,45000),

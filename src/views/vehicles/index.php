@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Liste des Véhicules</title>
     <style>
-      /* styles rapide pour le modal */
+      /* styles rapide pour le modal a modif pour du Tailwind*/
       #overlay {
         display: none;
         position: fixed;
@@ -140,7 +140,6 @@
         </tbody>
     </table>
 
-    <!-- Overlay & Modal -->
     <div id="overlay"></div>
     <div id="modal">
       <h2>Détails du véhicule</h2>

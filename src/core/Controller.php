@@ -30,7 +30,6 @@ class Controller
             exit;
         }
 
-        // fallback JavaScript en cas de headers déjà envoyés
         echo "<script>window.location.replace('{$url}');</script>";
         exit;
     }

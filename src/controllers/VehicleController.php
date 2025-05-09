@@ -18,7 +18,7 @@ class VehicleController extends Controller
 
     public function delete(): void
     {
-        // seulement les admins peuvent supprimer
+        // tu connais pour que seulement les admins peuvent supprimer
         if (! Auth::check()) {
             $this->redirect('/');
         }

@@ -1,1 +1,0 @@
-<!-- Contenu du modal détails -->
