@@ -72,7 +72,7 @@
           <span><?= htmlspecialchars("{$user['user_firstname']} {$user['user_name']}", ENT_QUOTES) ?></span>
           <a href="/logout">Déconnexion</a>
           <?php if (Auth::check()): ?>
-            | <a href="/admin">Pannel Admin</a>
+            | <a href="/admin">Panel Admin</a>
           <?php endif; ?>
         </div>
       <?php else: // non connecté ?>

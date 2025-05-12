@@ -20,8 +20,3 @@ CREATE TABLE vehicles (
   km INTEGER,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
-INSERT INTO vehicles(immatriculation,type,fabricant,modele,couleur,nb_sieges,km)
-VALUES
-  ('XYZ-999','BERLINE','Toyota','Corolla','Bleu',5,45000),
-  ('ABC-123','SUV','Ford','Explorer','Noir',7,32000);
