@@ -29,6 +29,8 @@ $router->post('/login',              [AuthController::class, 'login']);
 $router->get('/register',            [AuthController::class, 'showRegister']);
 $router->post('/register',           [AuthController::class, 'register']);
 $router->get('/logout',              [AuthController::class, 'logout']);
+// … juste avant $router->run();
+$router->get('/admin', [VehicleController::class, 'adminPanel']);
 
 // Lancer le routeur
 $router->run();

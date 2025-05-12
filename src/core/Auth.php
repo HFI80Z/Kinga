@@ -5,12 +5,12 @@ class Auth
 {
     public static function check(): bool
     {
-        // Démarre la session seulement si ce n’est pas déjà fait
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
 
-        return isset($_SESSION['user'])
-            && ($_SESSION['user']['role'] ?? '') === 'ADMIN';
+        // on compare en lowercase pour être sûr
+        $role = strtolower($_SESSION['user']['role'] ?? '');
+        return isset($_SESSION['user']) && $role === 'admin';
     }
 }
