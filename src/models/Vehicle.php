@@ -1,101 +1,99 @@
 <?php
 declare(strict_types=1);
-
 namespace App\Models;
 
 use App\Core\Model;
 use PDO;
-use PDOException;
 
 class Vehicle extends Model
 {
-    /**
-     * Récupère tous les véhicules
-     *
-     * @return array
-     */
+    public function search(
+        string $type = '',
+        string $fabricant = '',
+        string $model = '',
+        string $color = '',
+        int    $seats = 0,
+        int    $kmMax = 0
+    ): array {
+        $sql = 'SELECT * FROM vehicles WHERE 1=1';
+        $p   = [];
+
+        if ($type)      { $sql .= ' AND type LIKE :type';           $p[':type']      = "%$type%"; }
+        if ($fabricant) { $sql .= ' AND fabricant LIKE :fab';      $p[':fab']       = "%$fabricant%"; }
+        if ($model)     { $sql .= ' AND modele LIKE :model';       $p[':model']     = "%$model%"; }
+        if ($color)     { $sql .= ' AND couleur LIKE :color';      $p[':color']     = "%$color%"; }
+        if ($seats > 0) { $sql .= ' AND nb_sieges = :seats';       $p[':seats']     = $seats; }
+        if ($kmMax > 0) { $sql .= ' AND km <= :kmMax';            $p[':kmMax']     = $kmMax; }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($p);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getAll(): array
     {
-        try {
-            $stmt = $this->db->query('SELECT * FROM vehicles');
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            // logger($e->getMessage());
-            return [];
-        }
+        return $this->db
+            ->query('SELECT * FROM vehicles')
+            ->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Récupère un véhicule par son ID
-     */
     public function find(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM vehicles WHERE id = :id LIMIT 1');
-        $stmt->execute([':id' => $id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
+        $stmt = $this->db->prepare('SELECT * FROM vehicles WHERE id=:id');
+        $stmt->execute([':id'=>$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
-    /**
-     * Crée un nouveau véhicule et renvoie son ID
-     */
-    public function create(array $data): int
+    public function create(array $d): int
     {
-        $sql = '
-            INSERT INTO vehicles 
-              (immatriculation, type, fabricant, modele, couleur, nb_sieges, km)
-            VALUES 
-              (:immatriculation, :type, :fabricant, :modele, :couleur, :nb_sieges, :km)
-            RETURNING id
-        ';
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->prepare(
+            'INSERT INTO vehicles
+               (immatriculation,type,fabricant,modele,couleur,nb_sieges,km)
+             VALUES
+               (:imm,:type,:fab,:mod,:col,:seats,:km)
+             RETURNING id'
+        );
         $stmt->execute([
-            ':immatriculation' => $data['immatriculation'],
-            ':type'            => $data['type'],
-            ':fabricant'       => $data['fabricant'],
-            ':modele'          => $data['modele'],
-            ':couleur'         => $data['couleur'],
-            ':nb_sieges'       => $data['nb_sieges'],
-            ':km'              => $data['km'],
+            ':imm'   => $d['immatriculation'],
+            ':type'  => $d['type'],
+            ':fab'   => $d['fabricant'],
+            ':mod'   => $d['modele'],
+            ':col'   => $d['couleur'],
+            ':seats' => $d['nb_sieges'],
+            ':km'    => $d['km'],
         ]);
-        return (int) $stmt->fetchColumn();
+        return (int)$stmt->fetchColumn();
     }
 
-    /**
-     * Met à jour un véhicule existant
-     */
-    public function update(array $data): void
+    public function update(array $d): void
     {
-        $sql = '
-            UPDATE vehicles SET
-              immatriculation = :immatriculation,
-              type            = :type,
-              fabricant       = :fabricant,
-              modele          = :modele,
-              couleur         = :couleur,
-              nb_sieges       = :nb_sieges,
-              km              = :km
-            WHERE id = :id
-        ';
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->prepare(
+            'UPDATE vehicles SET
+               immatriculation=:imm,
+               type          =:type,
+               fabricant     =:fab,
+               modele        =:mod,
+               couleur       =:col,
+               nb_sieges     =:seats,
+               km            =:km
+             WHERE id=:id'
+        );
         $stmt->execute([
-            ':immatriculation' => $data['immatriculation'],
-            ':type'            => $data['type'],
-            ':fabricant'       => $data['fabricant'],
-            ':modele'          => $data['modele'],
-            ':couleur'         => $data['couleur'],
-            ':nb_sieges'       => $data['nb_sieges'],
-            ':km'              => $data['km'],
-            ':id'              => $data['id'],
+            ':imm'   => $d['immatriculation'],
+            ':type'  => $d['type'],
+            ':fab'   => $d['fabricant'],
+            ':mod'   => $d['modele'],
+            ':col'   => $d['couleur'],
+            ':seats' => $d['nb_sieges'],
+            ':km'    => $d['km'],
+            ':id'    => $d['id'],
         ]);
     }
 
-    /**
-     * Supprime définitivement un véhicule
-     */
     public function delete(int $id): void
     {
-        $stmt = $this->db->prepare('DELETE FROM vehicles WHERE id = :id');
-        $stmt->execute([':id' => $id]);
+        $this->db
+            ->prepare('DELETE FROM vehicles WHERE id=:id')
+            ->execute([':id'=>$id]);
     }
 }

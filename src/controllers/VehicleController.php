@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -9,128 +8,72 @@ use App\Models\Vehicle;
 
 class VehicleController extends Controller
 {
-    /**
-     * Page publique : liste des véhicules
-     */
     public function index(): void
     {
-        $vehicles = (new Vehicle())->getAll();
-        $this->view('vehicles/index', ['vehicles' => $vehicles]);
+        // Lire les filtres
+        $f = [
+            'type'      => trim($_GET['type']      ?? ''),
+            'fabricant' => trim($_GET['fabricant'] ?? ''),
+            'model'     => trim($_GET['model']     ?? ''),
+            'color'     => trim($_GET['color']     ?? ''),
+            'seats'     => (int) ($_GET['seats']   ?? 0),
+            'km_max'    => (int) ($_GET['km_max']  ?? 0),
+        ];
+
+        $vModel   = new Vehicle();
+        $vehicles = $vModel->search(
+            $f['type'],
+            $f['fabricant'],
+            $f['model'],
+            $f['color'],
+            $f['seats'],
+            $f['km_max']
+        );
+
+        $this->view('vehicles/index', array_merge(['vehicles'=>$vehicles], $f));
     }
 
-    /**
-     * Panneau admin : liste + formulaire d’ajout
-     */
     public function adminPanel(): void
     {
-        if (! Auth::check()) {
-            $this->redirect('/');
-        }
-
-        $vehicles = (new Vehicle())->getAll();
-        $this->view('vehicles/admin', ['vehicles' => $vehicles]);
+        if (!Auth::check()) $this->redirect('/');
+        $this->view('vehicles/admin', ['vehicles'=>(new Vehicle())->getAll()]);
     }
 
-    /**
-     * Formulaire de création
-     */
     public function create(): void
     {
-        if (! Auth::check()) {
-            $this->redirect('/');
-        }
-
-        // pour créer
+        Auth::check() ?: $this->redirect('/');
         $this->view('vehicles/form');
     }
 
-    /**
-     * Traitement du formulaire d’ajout
-     */
     public function store(): void
     {
-        if (! Auth::check()) {
-            $this->redirect('/');
-        }
-
-        $data = [
-            'immatriculation' => trim($_POST['immatriculation'] ?? ''),
-            'type'            => trim($_POST['type']            ?? ''),
-            'fabricant'       => trim($_POST['fabricant']       ?? ''),
-            'modele'          => trim($_POST['modele']          ?? ''),
-            'couleur'         => trim($_POST['couleur']         ?? ''),
-            'nb_sieges'       => (int) ($_POST['nb_sieges']      ?? 0),
-            'km'              => (int) ($_POST['km']             ?? 0),
-        ];
-
-        (new Vehicle())->create($data);
+        if (!Auth::check()) $this->redirect('/');
+        (new Vehicle())->create($_POST);
         $this->redirect('/admin');
     }
 
-    /**
-     * Edition d’un véhicule existant
-     */
     public function edit(): void
     {
-        if (! Auth::check()) {
-            $this->redirect('/');
-        }
-
-        $id = (int) ($_GET['id'] ?? 0);
-        if ($id <= 0) {
-            $this->redirect('/admin');
-        }
-
-        $vehicle = (new Vehicle())->find($id);
-        if (! $vehicle) {
-            $this->redirect('/admin');
-        }
-
-        // pour modifier
-        $this->view('vehicles/form', ['vehicle' => $vehicle]);
+        if (!Auth::check()) $this->redirect('/');
+        $id      = (int)($_GET['id'] ?? 0);
+        $vehicle = (new Vehicle())->find($id) ?: $this->redirect('/admin');
+        $this->view('vehicles/form', ['vehicle'=>$vehicle]);
     }
 
-    /**
-     * Mise à jour après édition
-     */
     public function update(): void
     {
-        if (! Auth::check()) {
-            $this->redirect('/');
-        }
-
-        $data = [
-            'id'              => (int) ($_POST['id']             ?? 0),
-            'immatriculation' => trim($_POST['immatriculation'] ?? ''),
-            'type'            => trim($_POST['type']            ?? ''),
-            'fabricant'       => trim($_POST['fabricant']       ?? ''),
-            'modele'          => trim($_POST['modele']          ?? ''),
-            'couleur'         => trim($_POST['couleur']         ?? ''),
-            'nb_sieges'       => (int) ($_POST['nb_sieges']      ?? 0),
-            'km'              => (int) ($_POST['km']             ?? 0),
-        ];
-
-        if ($data['id'] > 0) {
-            (new Vehicle())->update($data);
-        }
-
+        if (!Auth::check()) $this->redirect('/');
+        $data = array_merge($_POST, ['id'=>(int)($_POST['id'] ?? 0)]);
+        (new Vehicle())->update($data);
         $this->redirect('/admin');
     }
 
-    /**
-     * Suppression d’un véhicule
-     */
     public function delete(): void
     {
-        if (! Auth::check()) {
-            $this->redirect('/');
-        }
-
-        $id = (int) ($_GET['id'] ?? 0);
-        if ($id > 0) {
+        if (!Auth::check()) $this->redirect('/');
+        if ($id = (int)($_GET['id'] ?? 0)) {
             (new Vehicle())->delete($id);
         }
-
         $this->redirect('/admin');
     }
 }
