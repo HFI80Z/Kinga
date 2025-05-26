@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -20,8 +21,11 @@ class VehicleController extends Controller
             'km_max'    => (int) ($_GET['km_max']  ?? 0),
         ];
 
-        $vModel   = new Vehicle();
-        $vehicles = $vModel->search(
+        // Pagination
+        $page    = max(1, (int)($_GET['page'] ?? 1));
+        $limit   = 5;
+        $vModel  = new Vehicle();
+        $all     = $vModel->search(
             $f['type'],
             $f['fabricant'],
             $f['model'],
@@ -29,14 +33,41 @@ class VehicleController extends Controller
             $f['seats'],
             $f['km_max']
         );
+        $total       = count($all);
+        $totalPages  = (int) ceil($total / $limit);
+        $offset      = ($page - 1) * $limit;
+        $vehicles    = array_slice($all, $offset, $limit, true);
 
-        $this->view('vehicles/index', array_merge(['vehicles'=>$vehicles], $f));
+        $this->view('vehicles/index', array_merge(
+            ['vehicles'   => $vehicles,
+             'page'       => $page,
+             'totalPages' => $totalPages,
+             'offset'     => $offset],
+            $f
+        ));
     }
 
     public function adminPanel(): void
     {
-        if (!Auth::check()) $this->redirect('/');
-        $this->view('vehicles/admin', ['vehicles'=>(new Vehicle())->getAll()]);
+        if (!Auth::check()) {
+            $this->redirect('/');
+        }
+
+        // Pagination
+        $page    = max(1, (int)($_GET['page'] ?? 1));
+        $limit   = 5;
+        $all     = (new Vehicle())->getAll();
+        $total       = count($all);
+        $totalPages  = (int) ceil($total / $limit);
+        $offset      = ($page - 1) * $limit;
+        $vehicles    = array_slice($all, $offset, $limit, true);
+
+        $this->view('vehicles/admin', [
+            'vehicles'   => $vehicles,
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'offset'     => $offset,
+        ]);
     }
 
     public function create(): void
@@ -47,30 +78,38 @@ class VehicleController extends Controller
 
     public function store(): void
     {
-        if (!Auth::check()) $this->redirect('/');
+        if (!Auth::check()) {
+            $this->redirect('/');
+        }
         (new Vehicle())->create($_POST);
         $this->redirect('/admin');
     }
 
     public function edit(): void
     {
-        if (!Auth::check()) $this->redirect('/');
+        if (!Auth::check()) {
+            $this->redirect('/');
+        }
         $id      = (int)($_GET['id'] ?? 0);
         $vehicle = (new Vehicle())->find($id) ?: $this->redirect('/admin');
-        $this->view('vehicles/form', ['vehicle'=>$vehicle]);
+        $this->view('vehicles/form', ['vehicle' => $vehicle]);
     }
 
     public function update(): void
     {
-        if (!Auth::check()) $this->redirect('/');
-        $data = array_merge($_POST, ['id'=>(int)($_POST['id'] ?? 0)]);
+        if (!Auth::check()) {
+            $this->redirect('/');
+        }
+        $data = array_merge($_POST, ['id' => (int)($_POST['id'] ?? 0)]);
         (new Vehicle())->update($data);
         $this->redirect('/admin');
     }
 
     public function delete(): void
     {
-        if (!Auth::check()) $this->redirect('/');
+        if (!Auth::check()) {
+            $this->redirect('/');
+        }
         if ($id = (int)($_GET['id'] ?? 0)) {
             (new Vehicle())->delete($id);
         }
