@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Admin – Véhicules – Kinga</title>
+  <title>Panneau Admin – Véhicules – Kinga</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
@@ -13,9 +13,9 @@
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
     </div>
     <nav class="flex-1 px-2 space-y-1">
-      <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">&bull; Liste Véhicules</a>
-      <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">&bull; Commandes</a>
-      <a href="/admin/users" class="block px-4 py-2 rounded hover:bg-gray-700">&bull; Utilisateurs</a>
+      <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">Liste Véhicules</a>
+      <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">Commandes</a>
+      <a href="/admin/users" class="block px-4 py-2 rounded hover:bg-gray-700">Utilisateurs</a>
     </nav>
     <div class="px-6 py-4 border-t border-gray-700">
       <a href="/logout" class="block text-red-400 hover:text-red-300">Déconnexion</a>
@@ -25,70 +25,79 @@
   <!-- MAIN CONTENT -->
   <main class="flex-1 bg-gray-100 overflow-auto p-6">
 
-    <!-- ENTÊTE + FORMULAIRE D'AJOUT -->
+    <!-- TITLE + ADD FORM -->
     <section class="space-y-6">
       <h1 class="text-2xl font-bold text-gray-800">Panneau Administrateur – Véhicules</h1>
 
-      <form id="addVehicleForm" action="/vehicle/store" method="post"
+      <form action="/vehicle/store" method="post"
             class="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
+        <!-- Immatriculation -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Immatriculation *</label>
           <input name="immatriculation" required
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Type -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Type</label>
           <input name="type"
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Fabricant -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Fabricant</label>
           <input name="fabricant"
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Modèle -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Modèle</label>
           <input name="modele"
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Couleur -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Couleur</label>
           <input name="couleur"
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Nb sièges -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Nb sièges</label>
           <input type="number" name="nb_sieges" min="1"
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Kilométrage -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Kilométrage</label>
           <input type="number" name="km" min="0"
-                 class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Bouton Ajouter -->
         <div class="md:col-span-3 lg:col-span-1 flex items-end">
           <button type="submit"
-                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded">
+                  class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg">
             Ajouter
           </button>
         </div>
+
       </form>
     </section>
 
-    <!-- TABLEAU + PAGINATION -->
+    <!-- TABLE + PAGINATION -->
     <section class="mt-8">
-      <div class="bg-white rounded-lg shadow flex flex-col overflow-hidden" style="min-height:30rem;">
+      <div class="bg-white rounded-lg shadow flex flex-col overflow-hidden">
 
-        <!-- Tableau (prend tout l'espace restant) -->
-        <div class="overflow-x-auto flex-1">
+        <!-- Tableau -->
+        <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -104,23 +113,28 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <?php $cpt = 0; ?>
-              <?php foreach ($vehicles as $v): $cpt++; ?>
+              <?php $i = 0; foreach ($vehicles as $v): $i++; ?>
               <tr>
-                <td class="px-6 py-4"><?= $offset + $cpt ?></td>
+                <td class="px-6 py-4"><?= $offset + $i ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($v['type'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($v['modele'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= (int)$v['nb_sieges'] ?></td>
-                <td class="px-6 py-4"><?= number_format((int)$v['km'],0,'',' ') ?></td>
+                <td class="px-6 py-4 text-center"><?= (int)$v['nb_sieges'] ?></td>
+                <td class="px-6 py-4"><?= number_format((int)$v['km'],0,' ',' ') ?></td>
                 <td class="px-6 py-4 space-x-2">
+                  <!-- Modifier -->
                   <a href="/vehicle/edit?id=<?= (int)$v['id'] ?>"
-                     class="text-blue-600 hover:underline">Modifier</a>
+                     class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg">
+                    Modifier
+                  </a>
+                  <!-- Supprimer -->
                   <a href="/vehicle/delete?id=<?= (int)$v['id'] ?>"
                      onclick="return confirm('Supprimer ce véhicule ?');"
-                     class="text-red-600 hover:underline">Supprimer</a>
+                     class="inline-block bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded-lg">
+                    Supprimer
+                  </a>
                 </td>
               </tr>
               <?php endforeach; ?>
@@ -128,22 +142,26 @@
           </table>
         </div>
 
-        <!-- Pagination (collée en bas) -->
-        <div class="flex justify-between items-center mt-auto p-4">
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-4 p-4">
           <?php if ($page > 1): ?>
             <a href="?page=<?= $page - 1 ?>"
-               class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">←</a>
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+              ← Précédent
+            </a>
           <?php else: ?>
-            <span class="px-4"></span>
+            <span class="w-24"></span>
           <?php endif; ?>
 
           <span>Page <?= $page ?> sur <?= $totalPages ?></span>
 
           <?php if ($page < $totalPages): ?>
             <a href="?page=<?= $page + 1 ?>"
-               class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">→</a>
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+              Suivant →
+            </a>
           <?php else: ?>
-            <span class="px-4"></span>
+            <span class="w-24"></span>
           <?php endif; ?>
         </div>
 
