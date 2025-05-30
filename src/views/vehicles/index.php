@@ -66,22 +66,26 @@
     <div>
       <label class="block text-sm text-gray-700">Type</label>
       <input type="text" name="type" value="<?= htmlspecialchars($filter['type'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
+             placeholder="ex. SUV">
     </div>
     <div>
       <label class="block text-sm text-gray-700">Fabricant</label>
       <input type="text" name="fabricant" value="<?= htmlspecialchars($filter['fabricant'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
+             placeholder="ex. Toyota">
     </div>
     <div>
       <label class="block text-sm text-gray-700">Modèle</label>
       <input type="text" name="model" value="<?= htmlspecialchars($filter['model'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
+             placeholder="ex. Corolla">
     </div>
     <div>
       <label class="block text-sm text-gray-700">Couleur</label>
       <input type="text" name="color" value="<?= htmlspecialchars($filter['color'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
+             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
+             placeholder="ex. rouge">
     </div>
     <div>
       <label class="block text-sm text-gray-700">Nb sièges</label>
@@ -90,24 +94,24 @@
     </div>
     <div>
       <label class="block text-sm text-gray-700">
-        KM ≤ <span id="kmValue"><?= $filter['km_max'] ?></span>
+        KM ≤ <span id="kmValue" class="font-semibold"><?= $filter['km_max'] ?></span>
       </label>
       <input type="range" name="km_max"
-             min="0" max="250000" step="50000"
+             min="0" max="100000" step="20000"
              value="<?= $filter['km_max'] ?>"
-             class="mt-1 w-full accent-red-500"
+             class="mt-2 w-full accent-red-500"
              oninput="kmValue.innerText = this.value">
       <div class="flex justify-between text-xs text-gray-500 mt-1 px-1">
-        <span>0</span><span>50k</span><span>100k</span><span>150k</span><span>200k</span><span>250k</span>
+        <span>0</span><span>20 k</span><span>40 k</span><span>60 k</span><span>80 k</span><span>100 k</span>
       </div>
     </div>
     <div class="pt-4 border-t space-y-2">
       <button type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg">
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg text-center">
         Rechercher
       </button>
       <a href="/"
-         class="w-full block bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold text-center py-2 rounded-lg">
+         class="w-full block bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 rounded-lg text-center">
         Réinitialiser
       </a>
     </div>
@@ -122,37 +126,42 @@
   <?php else: ?>
     <div class="bg-white rounded-lg shadow flex flex-col overflow-hidden">
 
-      <!-- TABLE (flex-1 pour pousser la pagination en bas) -->
+      <!-- TABLEAU -->
       <div class="overflow-x-auto flex-1">
-        <table class="min-w-full">
+        <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-100">
             <tr>
-              <?php foreach (['Immatriculation','Type','Fabricant','Modèle','Couleur','Nb sièges','KM','Actions'] as $h): ?>
-                <th class="px-6 py-3 text-left text-sm font-medium text-gray-700"><?= $h ?></th>
-              <?php endforeach; ?>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Immatriculation</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Type</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Fabricant</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Modèle</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Couleur</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Nb sièges</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">KM</th>
+              <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="bg-white divide-y divide-gray-200">
             <?php foreach ($vehicles as $v): ?>
-            <tr class="border-t">
-              <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'],ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['type'],ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'],ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['modele'],ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'],ENT_QUOTES) ?></td>
+            <tr>
+              <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?></td>
+              <td class="px-6 py-4"><?= htmlspecialchars($v['type'], ENT_QUOTES) ?></td>
+              <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?></td>
+              <td class="px-6 py-4"><?= htmlspecialchars($v['modele'], ENT_QUOTES) ?></td>
+              <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?></td>
               <td class="px-6 py-4 text-center"><?= (int)$v['nb_sieges'] ?></td>
               <td class="px-6 py-4"><?= number_format((int)$v['km'],0,' ',' ') ?></td>
               <td class="px-6 py-4">
-                <button
-                  class="btn-detail bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-                  data-id="<?= (int)$v['id'] ?>"
-                  data-imm="<?= htmlspecialchars($v['immatriculation'],ENT_QUOTES) ?>"
-                  data-type="<?= htmlspecialchars($v['type'],ENT_QUOTES) ?>"
-                  data-fab="<?= htmlspecialchars($v['fabricant'],ENT_QUOTES) ?>"
-                  data-mod="<?= htmlspecialchars($v['modele'],ENT_QUOTES) ?>"
-                  data-cou="<?= htmlspecialchars($v['couleur'],ENT_QUOTES) ?>"
-                  data-seg="<?= (int)$v['nb_sieges'] ?>"
-                  data-km="<?= (int)$v['km'] ?>">
+                <button type="button"
+                        class="btn-detail bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                        data-id="<?= (int)$v['id'] ?>"
+                        data-imm="<?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?>"
+                        data-type="<?= htmlspecialchars($v['type'], ENT_QUOTES) ?>"
+                        data-fab="<?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?>"
+                        data-mod="<?= htmlspecialchars($v['modele'], ENT_QUOTES) ?>"
+                        data-cou="<?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?>"
+                        data-seg="<?= (int)$v['nb_sieges'] ?>"
+                        data-km="<?= (int)$v['km'] ?>">
                   Détails
                 </button>
               </td>
@@ -162,102 +171,110 @@
         </table>
       </div>
 
-      <!-- pagination (sticky, avec un mt-8 pour plus d'espace entre table et pagination) -->
-      <div class="mt-8 sticky bottom-4 bg-white flex justify-between items-center px-6 py-4">
+      <!-- PAGINATION STICKY -->
+      <div class="mt-6 sticky bottom-0 bg-white flex justify-between items-center px-6 py-4">
         <?php if ($page > 1): ?>
           <a href="?page=<?= $page - 1 ?>"
-             class="w-24 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
-            ← 
+             class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+            ←
           </a>
         <?php else: ?>
-          <span class="w-24"></span>
+          <span class="w-12"></span>
         <?php endif; ?>
 
-        <div class="text-gray-600">
-          Page <?= $page ?> sur <?= $totalPages ?>
-        </div>
+        <span class="text-gray-600">Page <?= $page ?> sur <?= $totalPages ?></span>
 
         <?php if ($page < $totalPages): ?>
           <a href="?page=<?= $page + 1 ?>"
-             class="w-24 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
-             →
+             class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+            →
           </a>
         <?php else: ?>
-          <span class="w-24"></span>
+          <span class="w-12"></span>
         <?php endif; ?>
       </div>
+
     </div>
   <?php endif; ?>
 
 </main>
 
-<!-- MODAL -->
+<!-- MODAL PUBLIC -->
 <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 <div id="modal"
-     class="hidden fixed top-1/4 left-1/2 transform -translate-x-1/2 bg-white p-6 rounded-lg shadow-lg z-50 w-11/12 max-w-md">
-  <h2 class="text-xl font-semibold mb-4">Détails du véhicule</h2>
-  <dl id="modalContent" class="mb-4 text-gray-700"></dl>
-  <div class="flex justify-end space-x-2">
-    <button id="modalClose" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Fermer</button>
-    <?php if ($user && $user['role']==='admin'): ?>
-      <button id="modalEdit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg">Modifier</button>
-      <button id="modalDelete" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg">Supprimer</button>
-    <?php endif; ?>
+     class="hidden fixed inset-0 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md">
+    <h2 class="text-xl font-semibold mb-4">Détails du véhicule</h2>
+    <div id="modalContent" class="grid grid-cols-2 gap-4 text-gray-700"></div>
+    <div class="mt-6 flex justify-end">
+      <button id="modalClose" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Fermer</button>
+    </div>
   </div>
 </div>
 
 <script>
-  // Sidebar toggle
+  // Sidebar filtre
   const side   = document.getElementById('filterSidebar'),
         ovF    = document.getElementById('filterOverlay');
   document.getElementById('openFilters').onclick = () => {
     side.classList.remove('-translate-x-full');
     ovF.classList.remove('hidden');
   };
-  document.getElementById('closeFilters').onclick = () => {
-    side.classList.add('-translate-x-full');
-    ovF.classList.add('hidden');
-  };
+  document.getElementById('closeFilters').onclick =
   ovF.onclick = () => {
     side.classList.add('-translate-x-full');
     ovF.classList.add('hidden');
   };
 
-  // Modal logic
+  // Modale détails
   const overlayM = document.getElementById('overlay'),
         modalM   = document.getElementById('modal'),
         contentM = document.getElementById('modalContent'),
-        btnClose = document.getElementById('modalClose'),
-        btnEdit  = document.getElementById('modalEdit'),
-        btnDel   = document.getElementById('modalDelete');
+        btnClose = document.getElementById('modalClose');
 
   document.querySelectorAll('button.btn-detail').forEach(btn =>
     btn.addEventListener('click', () => {
       const d = btn.dataset;
       contentM.innerHTML = `
-        <dt class="font-semibold">Immatriculation:</dt><dd>${d.imm}</dd>
-        <dt class="font-semibold">Type:</dt><dd>${d.type}</dd>
-        <dt class="font-semibold">Fabricant:</dt><dd>${d.fab}</dd>
-        <dt class="font-semibold">Modèle:</dt><dd>${d.mod}</dd>
-        <dt class="font-semibold">Couleur:</dt><dd>${d.cou}</dd>
-        <dt class="font-semibold">Nb sièges:</dt><dd>${d.seg}</dd>
-        <dt class="font-semibold">KM:</dt><dd>${d.km}</dd>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Immatriculation</div>
+          <div class="text-gray-600">${d.imm}</div>
+        </div>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Type</div>
+          <div class="text-gray-600">${d.type}</div>
+        </div>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Fabricant</div>
+          <div class="text-gray-600">${d.fab}</div>
+        </div>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Modèle</div>
+          <div class="text-gray-600">${d.mod}</div>
+        </div>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Couleur</div>
+          <div class="text-gray-600">${d.cou}</div>
+        </div>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Nb sièges</div>
+          <div class="text-gray-600">${d.seg}</div>
+        </div>
+        <div class="text-center">
+          <div class="font-semibold text-gray-800 mb-1">Kilométrage</div>
+          <div class="text-gray-600">${parseInt(d.km).toLocaleString('fr-FR')} km</div>
+        </div>
+        <div></div>
       `;
       overlayM.classList.remove('hidden');
       modalM.classList.remove('hidden');
-      if (btnEdit) btnEdit.onclick = () => location.href = `/vehicle/edit?id=${d.id}`;
-      if (btnDel)  btnDel.onclick  = () => {
-        if (confirm(`Supprimer le véhicule ${d.imm} ?`)) {
-          location.href = `/vehicle/delete?id=${d.id}`;
-        }
-      };
-    }))
-  ;
-  btnClose.onclick = () => {
+    })
+  );
+
+  btnClose.onclick = overlayM.onclick = () => {
     overlayM.classList.add('hidden');
     modalM.classList.add('hidden');
   };
-  overlayM.onclick = btnClose.onclick;
 </script>
 </body>
 </html>
