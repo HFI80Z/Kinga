@@ -43,3 +43,7 @@ CREATE TABLE IF NOT EXISTS maintenance_parts (
   part_name VARCHAR(255) NOT NULL,
   quantity INTEGER NOT NULL DEFAULT 1
 );
+
+ALTER TABLE maintenance
+ADD COLUMN closed_at TIMESTAMP NULL;
+DELETE FROM maintenance WHERE closed_at IS NOT NULL

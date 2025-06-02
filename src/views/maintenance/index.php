@@ -7,20 +7,44 @@
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
 
-  <!-- SIDEBAR (identique aux autres vues admin) -->
+  <!-- SIDEBAR (MÊME DANS index.php) -->
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
+    <!-- Logo -->
     <div class="px-6 py-4 flex items-center">
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
     </div>
+    <!-- Menu -->
     <nav class="flex-1 px-2 space-y-1">
-      <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">Liste Véhicules</a>
-      <a href="/admin/maintenance" class="block px-4 py-2 rounded bg-gray-700">Maintenances</a>
-      <a href="/admin/repairers" class="block px-4 py-2 rounded hover:bg-gray-700">Réparateurs</a>
-      <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">Commandes</a>
-      <a href="/admin/users" class="block px-4 py-2 rounded hover:bg-gray-700">Utilisateurs</a>
+      <a href="/admin"
+         class="block px-4 py-2 rounded hover:bg-gray-700">
+        Liste Véhicules
+      </a>
+      <a href="/admin/maintenance"
+         class="block px-4 py-2 rounded bg-gray-700">
+        Maintenances
+      </a>
+      <a href="/admin/maintenance/history"
+         class="block px-4 py-2 rounded hover:bg-gray-700">
+        Historique
+      </a>
+      <a href="/admin/repairers"
+         class="block px-4 py-2 rounded hover:bg-gray-700">
+        Réparateurs
+      </a>
+      <a href="/admin/orders"
+         class="block px-4 py-2 rounded hover:bg-gray-700">
+        Commandes
+      </a>
+      <a href="/admin/users"
+         class="block px-4 py-2 rounded hover:bg-gray-700">
+        Utilisateurs
+      </a>
     </nav>
+    <!-- Déconnexion -->
     <div class="px-6 py-4 border-t border-gray-700">
-      <a href="/logout" class="block text-red-400 hover:text-red-300">Déconnexion</a>
+      <a href="/logout" class="block text-red-400 hover:text-red-300">
+        Déconnexion
+      </a>
     </div>
   </aside>
 
@@ -99,7 +123,7 @@
     <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-lg">
       <h2 class="text-xl font-semibold mb-4">Pièces nécessaires</h2>
       <div id="modalContent" class="space-y-2 text-gray-700">
-        <!-- Le contenu sera injecté par JavaScript -->
+        <!-- Le contenu sera injecté en JavaScript -->
       </div>
       <div class="mt-6 flex justify-end">
         <button id="modalClose" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Fermer</button>
@@ -116,12 +140,10 @@
 
     document.querySelectorAll('button.btn-detail').forEach(btn => {
       btn.addEventListener('click', () => {
-        // Récupérer le tableau de pièces depuis l'attribut data-parts (JSON)
         const parts = JSON.parse(btn.getAttribute('data-parts'));
         if (!parts.length) {
           contentM.innerHTML = '<p class="text-gray-500">Aucune pièce enregistrée.</p>';
         } else {
-          // Construire le contenu : liste des pièces et quantités
           let html = '<ul class="list-disc list-inside">';
           parts.forEach(p => {
             html += `<li>${p.part_name} — Quantité : ${p.quantity}</li>`;

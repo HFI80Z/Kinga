@@ -43,10 +43,15 @@ $router->post('/repairer/update',     [RepairerController::class, 'update']);
 $router->get('/repairer/delete',      [RepairerController::class, 'delete']);
 
 // --- Routes pour les maintenances (panel admin) ---
-$router->get('/admin/maintenance',       [MaintenanceController::class, 'index']);
-$router->get('/admin/maintenance/form',  [MaintenanceController::class, 'form']);
-$router->post('/maintenance/store',      [MaintenanceController::class, 'store']);
-$router->get('/maintenance/close',       [MaintenanceController::class, 'close']);
+$router->get('/admin/maintenance',                [MaintenanceController::class, 'index']);
+$router->get('/admin/maintenance/form',           [MaintenanceController::class, 'form']);
+$router->post('/maintenance/store',               [MaintenanceController::class, 'store']);
+$router->get('/maintenance/close',                [MaintenanceController::class, 'close']);
+
+// Historiques des maintenances
+$router->get('/admin/maintenance/history',        [MaintenanceController::class, 'history']);
+// Supprimer l’historique
+$router->post('/admin/maintenance/history/clear', [MaintenanceController::class, 'clearHistory']);
 
 // Lancer le routeur
 $router->run();
