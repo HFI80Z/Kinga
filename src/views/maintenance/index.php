@@ -7,13 +7,11 @@
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
 
-  <!-- SIDEBAR (MÊME DANS index.php) -->
+  <!-- SIDEBAR (identique aux autres vues admin) -->
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
-    <!-- Logo -->
     <div class="px-6 py-4 flex items-center">
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
     </div>
-    <!-- Menu -->
     <nav class="flex-1 px-2 space-y-1">
       <a href="/admin"
          class="block px-4 py-2 rounded hover:bg-gray-700">
@@ -40,7 +38,6 @@
         Utilisateurs
       </a>
     </nav>
-    <!-- Déconnexion -->
     <div class="px-6 py-4 border-t border-gray-700">
       <a href="/logout" class="block text-red-400 hover:text-red-300">
         Déconnexion
@@ -62,7 +59,7 @@
       -->
     </section>
 
-    <!-- TABLEAU DES MAINTENANCES EN COURS -->
+    <!-- TABLEAU DES MAINTENANCES EN COURS (PAGE ACTUELLE) -->
     <div class="bg-white rounded-lg shadow overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -84,9 +81,15 @@
               </td>
             </tr>
           <?php else: ?>
-            <?php $i = 0; foreach ($maintenances as $m): $i++; ?>
+            <?php 
+              $i = 0; 
+              // Calculer le numéro absolu de la première ligne de la page :
+              $startIndex = ($page - 1) * 5;
+              foreach ($maintenances as $m): 
+                $i++;
+            ?>
               <tr>
-                <td class="px-6 py-4"><?= $i ?></td>
+                <td class="px-6 py-4"><?= $startIndex + $i ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($m['immatriculation'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($m['type'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($m['repairer_name'], ENT_QUOTES) ?></td>
@@ -114,6 +117,29 @@
       </table>
     </div>
 
+    <!-- PAGINATION : Précédent / Suivant -->
+    <div class="flex justify-between items-center mt-4">
+      <?php if ($page > 1): ?>
+        <a href="?page=<?= $page - 1 ?>"
+           class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+          ← Précédent
+        </a>
+      <?php else: ?>
+        <span class="w-24"></span>
+      <?php endif; ?>
+
+      <span class="text-gray-600">Page <?= $page ?> sur <?= $totalPages ?></span>
+
+      <?php if ($page < $totalPages): ?>
+        <a href="?page=<?= $page + 1 ?>"
+           class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+          Suivant →
+        </a>
+      <?php else: ?>
+        <span class="w-24"></span>
+      <?php endif; ?>
+    </div>
+
   </main>
 
   <!-- MODAL “Détails des pièces” -->
@@ -123,7 +149,7 @@
     <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-lg">
       <h2 class="text-xl font-semibold mb-4">Pièces nécessaires</h2>
       <div id="modalContent" class="space-y-2 text-gray-700">
-        <!-- Le contenu sera injecté en JavaScript -->
+        <!-- Contenu injecté par JavaScript -->
       </div>
       <div class="mt-6 flex justify-end">
         <button id="modalClose" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Fermer</button>

@@ -13,8 +13,8 @@ use App\Models\Vehicle as VehicleModel;
 class MaintenanceController extends Controller
 {
     /**
-     * Affiche la liste des maintenances en cours (is_active = TRUE),
-     * avec les pièces nécessaires.
+     * Affiche la liste paginée des maintenances en cours (is_active = TRUE),
+     * avec les pièces nécessaires pour chacune.
      */
     public function index(): void
     {
@@ -22,19 +22,34 @@ class MaintenanceController extends Controller
             $this->redirect('/');
         }
 
-        $mModel   = new Maintenance();
-        $mpModel  = new MaintenancePart();
+        $mModel  = new Maintenance();
+        $mpModel = new MaintenancePart();
 
-        // 1) Récupérer toutes les maintenances actives
-        $activeMaintenances = $mModel->getAllActive();
-        // 2) Pour chaque maintenance, ajouter la liste des pièces associées
-        foreach ($activeMaintenances as &$m) {
+        // Récupérer toutes les maintenances actives
+        $allActive = $mModel->getAllActive();  // tableau complet
+
+        // Pagination
+        $page       = max(1, (int)($_GET['page'] ?? 1));
+        $perPage    = 5;
+        $total      = count($allActive);
+        $totalPages = (int)ceil($total / $perPage);
+        $offset     = ($page - 1) * $perPage;
+
+        // Extraire la sous-liste (slice) des éléments à afficher
+        $activePage = array_slice($allActive, $offset, $perPage, true);
+
+        // Pour chaque maintenance de la page, récupérer les pièces associées
+        foreach ($activePage as &$m) {
             $m['parts'] = $mpModel->getByMaintenance((int)$m['maintenance_id']);
         }
         unset($m);
 
-        // Envoyer à la vue
-        $this->view('maintenance/index', ['maintenances' => $activeMaintenances]);
+        // Appeler la vue avec les données paginées
+        $this->view('maintenance/index', [
+            'maintenances' => $activePage,
+            'page'         => $page,
+            'totalPages'   => $totalPages
+        ]);
     }
 
     /**
@@ -58,7 +73,7 @@ class MaintenanceController extends Controller
         // Récupérer tous les réparateurs
         $repairers = (new Repairer())->getAll();
 
-        // Si on n’a pas de véhicule pré-sélectionné, on charge ceux disponibles
+        // Si aucun véhicule pré-sélectionné, charger ceux disponibles pour maintenance
         $availableVehicles = [];
         if (!$vehicle) {
             $availableVehicles = (new VehicleModel())->getAvailableForMaintenance();
@@ -134,24 +149,24 @@ class MaintenanceController extends Controller
             $this->redirect('/');
         }
 
-        $mModel  = new Maintenance();
+        $mModel     = new Maintenance();
         $allHistory = $mModel->getAllHistory(); // tableau complet
 
         // Pagination
-        $page      = max(1, (int)($_GET['page'] ?? 1));
-        $perPage   = 5;
-        $total     = count($allHistory);
+        $page       = max(1, (int)($_GET['page'] ?? 1));
+        $perPage    = 5;
+        $total      = count($allHistory);
         $totalPages = (int)ceil($total / $perPage);
-        $offset    = ($page - 1) * $perPage;
+        $offset     = ($page - 1) * $perPage;
 
-        // Extraire la tranche à afficher
+        // Extraire la page courante
         $historyPage = array_slice($allHistory, $offset, $perPage, true);
 
-        // Calculer la durée pour chaque entrée de la page
+        // Calculer la durée pour chaque entrée
         foreach ($historyPage as &$h) {
             if ($h['closed_at'] !== null) {
-                $start = new \DateTime($h['created_at']);
-                $end   = new \DateTime($h['closed_at']);
+                $start    = new \DateTime($h['created_at']);
+                $end      = new \DateTime($h['closed_at']);
                 $interval = $start->diff($end);
                 $h['duration'] = sprintf(
                     '%d jours %02d:%02d:%02d',
@@ -174,14 +189,15 @@ class MaintenanceController extends Controller
     }
 
     /**
-     * Supprime (vide) l’historique : efface toutes les entrées dont closed_at n’est pas NULL.
+     * Supprime entièrement l’historique (toutes les maintenances & pièces),
+     * qu’elles soient en cours ou déjà fermées.
      */
     public function clearHistory(): void
     {
         if (!Auth::check()) {
             $this->redirect('/');
         }
-        (new Maintenance())->clearClosed();
+        (new Maintenance())->clearAll();
         $this->redirect('/admin/maintenance/history');
     }
 }

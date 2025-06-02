@@ -103,13 +103,15 @@ class Maintenance extends Model
     }
 
     /**
-     * Supprime toutes les maintenances fermées (closed_at IS NOT NULL).
+     * Supprime TOUTES les maintenances (fermées ou en cours),
+     * ainsi que les pièces liées (maintenance_parts).
      */
-    public function clearClosed(): void
+    public function clearAll(): void
     {
-        $this->db->exec("
-            DELETE FROM maintenance
-            WHERE closed_at IS NOT NULL
-        ");
+        // 1) Supprimer toutes les pièces liées
+        $this->db->exec("DELETE FROM maintenance_parts");
+
+        // 2) Supprimer toutes les maintenances
+        $this->db->exec("DELETE FROM maintenance");
     }
 }

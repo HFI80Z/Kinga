@@ -7,13 +7,11 @@
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
 
-  <!-- SIDEBAR (identique aux autres vues admin) -->
+  <!-- SIDEBAR (identique) -->
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
-    <!-- Logo -->
     <div class="px-6 py-4 flex items-center">
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
     </div>
-    <!-- Menu -->
     <nav class="flex-1 px-2 space-y-1">
       <a href="/admin"
          class="block px-4 py-2 rounded hover:bg-gray-700">
@@ -40,7 +38,6 @@
         Utilisateurs
       </a>
     </nav>
-    <!-- Déconnexion -->
     <div class="px-6 py-4 border-t border-gray-700">
       <a href="/logout" class="block text-red-400 hover:text-red-300">
         Déconnexion
