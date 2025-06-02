@@ -7,35 +7,31 @@
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
 
-  <!-- SIDEBAR (identique aux autres vues admin) -->
+  <!-- SIDEBAR (identique aux autres vues admin, sans “Commandes” / “Utilisateurs”) -->
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
     <div class="px-6 py-4 flex items-center">
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
     </div>
     <nav class="flex-1 px-2 space-y-1">
+      <!-- Lien vers la liste des véhicules -->
       <a href="/admin"
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Liste Véhicules
       </a>
+      <!-- Lien vers le module “Maintenances” (actif) -->
       <a href="/admin/maintenance"
          class="block px-4 py-2 rounded bg-gray-700">
         Maintenances
       </a>
+      <!-- Lien vers l’historique des maintenances -->
       <a href="/admin/maintenance/history"
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Historique
       </a>
+      <!-- Lien vers le module “Réparateurs” -->
       <a href="/admin/repairers"
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Réparateurs
-      </a>
-      <a href="/admin/orders"
-         class="block px-4 py-2 rounded hover:bg-gray-700">
-        Commandes
-      </a>
-      <a href="/admin/users"
-         class="block px-4 py-2 rounded hover:bg-gray-700">
-        Utilisateurs
       </a>
     </nav>
     <div class="px-6 py-4 border-t border-gray-700">
@@ -51,6 +47,7 @@
     <!-- TITRE -->
     <section class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Panneau Admin – Maintenances</h1>
+      <!-- Vous pouvez décommenter ce bouton si vous souhaitez ajouter un lien vers le formulaire de création -->
       <!--
       <a href="/admin/maintenance/form"
          class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg">
@@ -96,7 +93,7 @@
                 <td class="px-6 py-4"><?= nl2br(htmlspecialchars($m['reason'], ENT_QUOTES)) ?></td>
                 <td class="px-6 py-4"><?= (new DateTime($m['created_at']))->format('d/m/Y H:i') ?></td>
                 <td class="px-6 py-4 space-x-2">
-                  <!-- Bouton “Détails” -->
+                  <!-- Bouton “Détails” (affiche les pièces nécessaires) -->
                   <button type="button"
                           class="btn-detail inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg"
                           data-parts='<?= json_encode($m['parts'], JSON_HEX_APOS|JSON_HEX_QUOT) ?>'>

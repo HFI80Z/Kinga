@@ -9,7 +9,8 @@ use PDO;
 class Vehicle extends Model
 {
     /**
-     * Recherche simple avec filtres (utilisé côté public originellement).
+     * Recherche simple avec filtres (non utilisé depuis passage en checkbox,
+     * mais conservé si besoin) :
      */
     public function search(
         string $type = '',
@@ -117,8 +118,7 @@ class Vehicle extends Model
     }
 
     /**
-     * Récupère tous les véhicules qui NE sont PAS en maintenance active.
-     * (utilisé pour alimenter le <select> dans le formulaire de maintenance).
+     * Récupère tous les véhicules pour sélection en maintenance.
      */
     public function getAvailableForMaintenance(): array
     {
@@ -136,30 +136,81 @@ class Vehicle extends Model
     }
 
     /**
-     * Recherche + exclusion des véhicules en maintenance active.
-     * (remplace la méthode search() côté public pour ne pas afficher
-     *  les véhicules actuellement en réparation).
+     * Recherche + exclusion des véhicules en maintenance active,
+     * avec possibilité de filtrer sur :
+     *   - $types (tableau de valeurs, p. ex. ['Moto','Berline']),
+     *   - $fabricants (tableau, p. ex. ['Honda','TVS']),
+     *   - $model (string),
+     *   - $colors (tableau de couleurs),
+     *   - $seats (int),
+     *   - $kmMax (int).
      */
     public function searchExcludingMaintenance(
-        string $type = '',
-        string $fabricant = '',
+        array  $types = [],
+        array  $fabricants = [],
         string $model = '',
-        string $color = '',
+        array  $colors = [],
         int    $seats = 0,
         int    $kmMax = 0
     ): array {
-        // Construire la partie WHERE pour les filtres
-        $where = 'WHERE 1=1';
-        $params = [];
+        $where   = 'WHERE 1=1';
+        $params  = [];
 
-        if ($type)      { $where .= ' AND v.type LIKE :type';      $params[':type']      = "%$type%"; }
-        if ($fabricant) { $where .= ' AND v.fabricant LIKE :fab';   $params[':fab']       = "%$fabricant%"; }
-        if ($model)     { $where .= ' AND v.modele LIKE :model';    $params[':model']     = "%$model%"; }
-        if ($color)     { $where .= ' AND v.couleur LIKE :color';   $params[':color']     = "%$color%"; }
-        if ($seats > 0) { $where .= ' AND v.nb_sieges = :seats';    $params[':seats']     = $seats; }
-        if ($kmMax > 0) { $where .= ' AND v.km <= :kmMax';         $params[':kmMax']     = $kmMax; }
+        // 1) FILTRE TYPE (tableau)
+        if (!empty($types)) {
+            $placeholders = [];
+            foreach ($types as $i => $t) {
+                $ph = ":t{$i}";
+                $placeholders[] = $ph;
+                $params[$ph] = $t;
+            }
+            $inClause = implode(', ', $placeholders);
+            $where .= " AND v.type IN ($inClause)";
+        }
 
-        // On joint maintenance pour exclure tous ceux qui ont is_active = TRUE
+        // 2) FILTRE FABRICANT (tableau)
+        if (!empty($fabricants)) {
+            $placeholders = [];
+            foreach ($fabricants as $i => $f) {
+                $ph = ":f{$i}";
+                $placeholders[] = $ph;
+                $params[$ph] = $f;
+            }
+            $inClause = implode(', ', $placeholders);
+            $where .= " AND v.fabricant IN ($inClause)";
+        }
+
+        // 3) FILTRE MODEL (texte libre / LIKE)
+        if ($model !== '') {
+            $where .= ' AND v.modele LIKE :model';
+            $params[':model'] = "%$model%";
+        }
+
+        // 4) FILTRE COULEUR (tableau)
+        if (!empty($colors)) {
+            $placeholders = [];
+            foreach ($colors as $i => $c) {
+                $ph = ":c{$i}";
+                $placeholders[] = $ph;
+                $params[$ph] = $c;
+            }
+            $inClause = implode(', ', $placeholders);
+            $where .= " AND v.couleur IN ($inClause)";
+        }
+
+        // 5) FILTRE NB SIEGES (égalité)
+        if ($seats > 0) {
+            $where .= ' AND v.nb_sieges = :seats';
+            $params[':seats'] = $seats;
+        }
+
+        // 6) FILTRE KM MAX (≤)
+        if ($kmMax > 0) {
+            $where .= ' AND v.km <= :kmMax';
+            $params[':kmMax'] = $kmMax;
+        }
+
+        // Requête finale : on fait un LEFT JOIN sur maintenance pour exclure les véhicules en cours de maintenance
         $sql = "
             SELECT v.*
             FROM vehicles v
@@ -170,6 +221,7 @@ class Vehicle extends Model
             AND m.id IS NULL
             ORDER BY v.immatriculation
         ";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

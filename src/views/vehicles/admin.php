@@ -16,8 +16,9 @@
       <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">Liste Véhicules</a>
       <a href="/admin/maintenance" class="block px-4 py-2 rounded hover:bg-gray-700">Maintenances</a>
       <a href="/admin/repairers" class="block px-4 py-2 rounded hover:bg-gray-700">Réparateurs</a>
-      <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">Commandes</a>
-      <a href="/admin/users" class="block px-4 py-2 rounded hover:bg-gray-700">Utilisateurs</a>
+      <!-- Onglets supprimés : Commandes et Utilisateurs -->
+      <!-- <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">Commandes</a> -->
+      <!-- <a href="/admin/users" class="block px-4 py-2 rounded hover:bg-gray-700">Utilisateurs</a> -->
     </nav>
     <div class="px-6 py-4 border-t border-gray-700">
       <a href="/logout" class="block text-red-400 hover:text-red-300">Déconnexion</a>
@@ -44,15 +45,24 @@
         <!-- Type -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Type</label>
-          <input name="type"
-                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select name="type"
+                  class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Sélectionner --</option>
+            <option value="Moto">Moto</option>
+            <option value="Berline">Berline</option>
+            <option value="Pick up">Pick up</option>
+          </select>
         </div>
 
         <!-- Fabricant -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Fabricant</label>
-          <input name="fabricant"
-                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select name="fabricant"
+                  class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Sélectionner --</option>
+            <option value="Honda">Honda</option>
+            <option value="TVS">TVS</option>
+          </select>
         </div>
 
         <!-- Modèle -->
@@ -65,8 +75,17 @@
         <!-- Couleur -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Couleur</label>
-          <input name="couleur"
-                 class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select name="couleur"
+                  class="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Sélectionner --</option>
+            <option value="Noir">Noir</option>
+            <option value="Bleu">Bleu</option>
+            <option value="Rouge">Rouge</option>
+            <option value="Blanc">Blanc</option>
+            <option value="Gris">Gris</option>
+            <option value="Vert">Vert</option>
+            <option value="Jaune">Jaune</option>
+          </select>
         </div>
 
         <!-- Nb sièges -->
@@ -175,7 +194,7 @@
           <?php if ($page < $totalPages): ?>
             <a href="?page=<?= $page + 1 ?>"
                class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
-              Suivant →
+              Suivant → 
             </a>
           <?php else: ?>
             <span class="w-24"></span>

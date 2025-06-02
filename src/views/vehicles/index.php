@@ -8,15 +8,28 @@
 <body class="bg-gray-50 min-h-screen flex flex-col">
 <?php
   use App\Core\Auth;
-  $user   = $_SESSION['user'] ?? null;
+
+  // On récupère les filtres envoyés en GET
+  // type, fabricant et color sont des tableaux (cases à cocher)
   $filter = [
-    'type'      => $_GET['type']      ?? '',
-    'fabricant' => $_GET['fabricant'] ?? '',
+    'type'      => $_GET['type']      ?? [],
+    'fabricant' => $_GET['fabricant'] ?? [],
     'model'     => $_GET['model']     ?? '',
-    'color'     => $_GET['color']     ?? '',
+    'color'     => $_GET['color']     ?? [],
     'seats'     => (int)($_GET['seats']   ?? 0),
     'km_max'    => (int)($_GET['km_max'] ?? 0),
   ];
+
+  // S’assurer que ce sont bien des tableaux
+  if (!is_array($filter['type'])) {
+      $filter['type'] = $filter['type'] !== '' ? [ $filter['type'] ] : [];
+  }
+  if (!is_array($filter['fabricant'])) {
+      $filter['fabricant'] = $filter['fabricant'] !== '' ? [ $filter['fabricant'] ] : [];
+  }
+  if (!is_array($filter['color'])) {
+      $filter['color'] = $filter['color'] !== '' ? [ $filter['color'] ] : [];
+  }
 ?>
 <!-- HEADER -->
 <header class="bg-white shadow-sm">
@@ -34,11 +47,11 @@
       </a>
     </div>
     <div class="flex items-center space-x-4 text-gray-700">
-      <?php if ($user): ?>
+      <?php if (isset($_SESSION['user'])): ?>
         <img src="/assets/img/user.png" alt="Avatar" class="h-8 w-8 rounded-full">
-        <span><?= htmlspecialchars("{$user['user_firstname']} {$user['user_name']}", ENT_QUOTES) ?></span>
+        <span><?= htmlspecialchars($_SESSION['user']['user_firstname'] . ' ' . $_SESSION['user']['user_name'], ENT_QUOTES) ?></span>
         <a href="/logout" class="hover:text-red-500">Déconnexion</a>
-        <?php if (Auth::check()): ?>
+        <?php if (\App\Core\Auth::check()): ?>
           <a href="/admin" class="hover:text-red-500">Panel Admin</a>
         <?php endif; ?>
       <?php else: ?>
@@ -62,36 +75,78 @@
       </svg>
     </button>
   </div>
+
   <form method="get" action="" class="p-4 space-y-5 overflow-y-auto h-full">
+    <!-- FILTRE : TYPE (checkbox group) -->
     <div>
-      <label class="block text-sm text-gray-700">Type</label>
-      <input type="text" name="type" value="<?= htmlspecialchars($filter['type'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
-             placeholder="ex. SUV">
+      <span class="block text-sm font-medium text-gray-700">Type</span>
+      <div class="mt-2 space-y-1">
+        <?php
+          $typesPossibles = ['Moto', 'Berline', 'Pick up'];
+          foreach ($typesPossibles as $t):
+            $checked = in_array($t, $filter['type'], true) ? 'checked' : '';
+        ?>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="type[]" value="<?= $t ?>" <?= $checked ?>
+                   class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+            <span class="ml-2 text-gray-700"><?= $t ?></span>
+          </label><br>
+        <?php endforeach; ?>
+      </div>
     </div>
+
+    <!-- FILTRE : FABRICANT (checkbox group) -->
     <div>
-      <label class="block text-sm text-gray-700">Fabricant</label>
-      <input type="text" name="fabricant" value="<?= htmlspecialchars($filter['fabricant'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
-             placeholder="ex. Toyota">
+      <span class="block text-sm font-medium text-gray-700">Fabricant</span>
+      <div class="mt-2 space-y-1">
+        <?php
+          $fabricantsPossibles = ['Honda', 'TVS'];
+          foreach ($fabricantsPossibles as $f):
+            $checked = in_array($f, $filter['fabricant'], true) ? 'checked' : '';
+        ?>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="fabricant[]" value="<?= $f ?>" <?= $checked ?>
+                   class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+            <span class="ml-2 text-gray-700"><?= $f ?></span>
+          </label><br>
+        <?php endforeach; ?>
+      </div>
     </div>
+
+    <!-- FILTRE : MODÈLE (texte libre) -->
     <div>
       <label class="block text-sm text-gray-700">Modèle</label>
       <input type="text" name="model" value="<?= htmlspecialchars($filter['model'], ENT_QUOTES) ?>"
              class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
              placeholder="ex. Corolla">
     </div>
+
+    <!-- FILTRE : COULEUR (checkbox group) -->
     <div>
-      <label class="block text-sm text-gray-700">Couleur</label>
-      <input type="text" name="color" value="<?= htmlspecialchars($filter['color'], ENT_QUOTES) ?>"
-             class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500"
-             placeholder="ex. rouge">
+      <span class="block text-sm font-medium text-gray-700">Couleur</span>
+      <div class="mt-2 space-y-1">
+        <?php
+          $couleursPossibles = ['Noir', 'Bleu', 'Rouge', 'Blanc', 'Gris', 'Vert', 'Jaune'];
+          foreach ($couleursPossibles as $c):
+            $checked = in_array($c, $filter['color'], true) ? 'checked' : '';
+        ?>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="color[]" value="<?= $c ?>" <?= $checked ?>
+                   class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+            <span class="ml-2 text-gray-700"><?= $c ?></span>
+          </label><br>
+        <?php endforeach; ?>
+      </div>
     </div>
+
+    <!-- FILTRE : NB SIÈGES (nombre) -->
     <div>
       <label class="block text-sm text-gray-700">Nb sièges</label>
       <input type="number" name="seats" min="1" value="<?= $filter['seats'] ?>"
              class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
     </div>
+
+    <!-- FILTRE : KM MAX (slider) -->
     <div>
       <label class="block text-sm text-gray-700">
         KM ≤ <span id="kmValue" class="font-semibold"><?= $filter['km_max'] ?></span>
@@ -105,6 +160,8 @@
         <span>0</span><span>20 k</span><span>40 k</span><span>60 k</span><span>80 k</span><span>100 k</span>
       </div>
     </div>
+
+    <!-- BOUTONS Rechercher / Réinitialiser -->
     <div class="pt-4 border-t space-y-2">
       <button type="submit"
               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg text-center">
@@ -120,12 +177,10 @@
 
 <!-- MAIN CONTENT -->
 <main class="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col">
-
   <?php if (empty($vehicles)): ?>
     <p class="text-center text-gray-600">Aucun véhicule trouvé.</p>
   <?php else: ?>
     <div class="bg-white rounded-lg shadow flex flex-col overflow-hidden">
-
       <!-- TABLEAU -->
       <div class="overflow-x-auto flex-1">
         <table class="min-w-full divide-y divide-gray-200">
@@ -143,29 +198,29 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <?php foreach ($vehicles as $v): ?>
-            <tr>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['type'], ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['modele'], ENT_QUOTES) ?></td>
-              <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?></td>
-              <td class="px-6 py-4 text-center"><?= (int)$v['nb_sieges'] ?></td>
-              <td class="px-6 py-4"><?= number_format((int)$v['km'],0,' ',' ') ?></td>
-              <td class="px-6 py-4">
-                <button type="button"
-                        class="btn-detail bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-                        data-id="<?= (int)$v['id'] ?>"
-                        data-imm="<?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?>"
-                        data-type="<?= htmlspecialchars($v['type'], ENT_QUOTES) ?>"
-                        data-fab="<?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?>"
-                        data-mod="<?= htmlspecialchars($v['modele'], ENT_QUOTES) ?>"
-                        data-cou="<?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?>"
-                        data-seg="<?= (int)$v['nb_sieges'] ?>"
-                        data-km="<?= (int)$v['km'] ?>">
-                  Détails
-                </button>
-              </td>
-            </tr>
+              <tr>
+                <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?></td>
+                <td class="px-6 py-4"><?= htmlspecialchars($v['type'], ENT_QUOTES) ?></td>
+                <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?></td>
+                <td class="px-6 py-4"><?= htmlspecialchars($v['modele'], ENT_QUOTES) ?></td>
+                <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?></td>
+                <td class="px-6 py-4 text-center"><?= (int)$v['nb_sieges'] ?></td>
+                <td class="px-6 py-4"><?= number_format((int)$v['km'],0,' ',' ') ?></td>
+                <td class="px-6 py-4">
+                  <button type="button"
+                          class="btn-detail bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                          data-id="<?= (int)$v['id'] ?>"
+                          data-imm="<?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?>"
+                          data-type="<?= htmlspecialchars($v['type'], ENT_QUOTES) ?>"
+                          data-fab="<?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?>"
+                          data-mod="<?= htmlspecialchars($v['modele'], ENT_QUOTES) ?>"
+                          data-cou="<?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?>"
+                          data-seg="<?= (int)$v['nb_sieges'] ?>"
+                          data-km="<?= (int)$v['km'] ?>">
+                    Détails
+                  </button>
+                </td>
+              </tr>
             <?php endforeach; ?>
           </tbody>
         </table>
@@ -175,9 +230,7 @@
       <div class="mt-6 sticky bottom-0 bg-white flex justify-between items-center px-6 py-4">
         <?php if ($page > 1): ?>
           <a href="?page=<?= $page - 1 ?>"
-             class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
-            ←
-          </a>
+             class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">←</a>
         <?php else: ?>
           <span class="w-12"></span>
         <?php endif; ?>
@@ -186,17 +239,13 @@
 
         <?php if ($page < $totalPages): ?>
           <a href="?page=<?= $page + 1 ?>"
-             class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
-            →
-          </a>
+             class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">→</a>
         <?php else: ?>
           <span class="w-12"></span>
         <?php endif; ?>
       </div>
-
     </div>
   <?php endif; ?>
-
 </main>
 
 <!-- MODAL PUBLIC -->

@@ -36,17 +36,24 @@
         <!-- Type -->
         <div class="col-span-1">
           <label class="block text-gray-700 mb-1">Type</label>
-          <input type="text" name="type"
-                 value="<?= htmlspecialchars($vehicle['type'] ?? '', ENT_QUOTES) ?>"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select name="type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="" <?= empty($vehicle['type']) ? 'selected' : '' ?>>-- Sélectionner --</option>
+            <option value="Moto" <?= (isset($vehicle) && $vehicle['type'] === 'Moto') ? 'selected' : '' ?>>Moto</option>
+            <option value="Berline" <?= (isset($vehicle) && $vehicle['type'] === 'Berline') ? 'selected' : '' ?>>Berline</option>
+            <option value="Pick up" <?= (isset($vehicle) && $vehicle['type'] === 'Pick up') ? 'selected' : '' ?>>Pick up</option>
+          </select>
         </div>
 
         <!-- Fabricant -->
         <div class="col-span-1">
           <label class="block text-gray-700 mb-1">Fabricant</label>
-          <input type="text" name="fabricant"
-                 value="<?= htmlspecialchars($vehicle['fabricant'] ?? '', ENT_QUOTES) ?>"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select name="fabricant"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="" <?= empty($vehicle['fabricant']) ? 'selected' : '' ?>>-- Sélectionner --</option>
+            <option value="Honda" <?= (isset($vehicle) && $vehicle['fabricant'] === 'Honda') ? 'selected' : '' ?>>Honda</option>
+            <option value="TVS" <?= (isset($vehicle) && $vehicle['fabricant'] === 'TVS') ? 'selected' : '' ?>>TVS</option>
+          </select>
         </div>
 
         <!-- Modèle -->
@@ -60,9 +67,17 @@
         <!-- Couleur -->
         <div class="col-span-1">
           <label class="block text-gray-700 mb-1">Couleur</label>
-          <input type="text" name="couleur"
-                 value="<?= htmlspecialchars($vehicle['couleur'] ?? '', ENT_QUOTES) ?>"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select name="couleur"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="" <?= empty($vehicle['couleur']) ? 'selected' : '' ?>>-- Sélectionner --</option>
+            <option value="Noir"   <?= (isset($vehicle) && $vehicle['couleur'] === 'Noir')   ? 'selected' : '' ?>>Noir</option>
+            <option value="Bleu"   <?= (isset($vehicle) && $vehicle['couleur'] === 'Bleu')   ? 'selected' : '' ?>>Bleu</option>
+            <option value="Rouge"  <?= (isset($vehicle) && $vehicle['couleur'] === 'Rouge')  ? 'selected' : '' ?>>Rouge</option>
+            <option value="Blanc"  <?= (isset($vehicle) && $vehicle['couleur'] === 'Blanc')  ? 'selected' : '' ?>>Blanc</option>
+            <option value="Gris"   <?= (isset($vehicle) && $vehicle['couleur'] === 'Gris')   ? 'selected' : '' ?>>Gris</option>
+            <option value="Vert"   <?= (isset($vehicle) && $vehicle['couleur'] === 'Vert')   ? 'selected' : '' ?>>Vert</option>
+            <option value="Jaune"  <?= (isset($vehicle) && $vehicle['couleur'] === 'Jaune')  ? 'selected' : '' ?>>Jaune</option>
+          </select>
         </div>
 
         <!-- Nb sièges -->

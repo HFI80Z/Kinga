@@ -6,59 +6,77 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Auth;
 use App\Models\Vehicle;
+use PDO;
 
 class VehicleController extends Controller
 {
     /**
-     * Page publique : liste des véhicules disponibles (hors maintenance).
+     * Page publique : liste des véhicules disponibles (hors maintenance),
+     * avec possibilité de cocher plusieurs valeurs de Type / Fabricant / Couleur.
      */
     public function index(): void
     {
-        // Récupération des filtres éventuels
-        $f = [
-            'type'      => trim($_GET['type']      ?? ''),
-            'fabricant' => trim($_GET['fabricant'] ?? ''),
-            'model'     => trim($_GET['model']     ?? ''),
-            'color'     => trim($_GET['color']     ?? ''),
-            'seats'     => (int)($_GET['seats']   ?? 0),
-            'km_max'    => (int)($_GET['km_max'] ?? 0),
-        ];
+        // 1) On récupère les filtres envoyés en GET
+        //    type, fabricant et color sont des tableaux (cases à cocher), model reste une chaîne,
+        //    seats et km_max restent des entiers.
+        $fType      = $_GET['type']      ?? [];
+        $fFabricant = $_GET['fabricant'] ?? [];
+        $fModel     = trim($_GET['model'] ?? '');
+        $fColor     = $_GET['color']     ?? [];
+        $fSeats     = (int)($_GET['seats']   ?? 0);
+        $fKmMax     = (int)($_GET['km_max'] ?? 0);
 
-        // Pagination
+        // S’assurer que ce sont bien des tableaux
+        if (!is_array($fType)) {
+            $fType = $fType !== '' ? [$fType] : [];
+        }
+        if (!is_array($fFabricant)) {
+            $fFabricant = $fFabricant !== '' ? [$fFabricant] : [];
+        }
+        if (!is_array($fColor)) {
+            $fColor = $fColor !== '' ? [$fColor] : [];
+        }
+
+        // 2) Pagination
         $page   = max(1, (int)($_GET['page'] ?? 1));
         $limit  = 5;
-        $vModel = new Vehicle();
 
-        // On utilise la méthode searchExcludingMaintenance() pour ne plus afficher
-        // les véhicules en maintenance active.
+        // 3) On appelle la méthode qui recherche hors maintenance active
+        $vModel = new Vehicle();
         $all    = $vModel->searchExcludingMaintenance(
-            $f['type'],
-            $f['fabricant'],
-            $f['model'],
-            $f['color'],
-            $f['seats'],
-            $f['km_max']
+            $fType,
+            $fFabricant,
+            $fModel,
+            $fColor,
+            $fSeats,
+            $fKmMax
         );
 
+        // 4) Pagination manuelle
         $total      = count($all);
         $totalPages = (int)ceil($total / $limit);
         $offset     = ($page - 1) * $limit;
         $vehicles   = array_slice($all, $offset, $limit, true);
 
-        $this->view('vehicles/index', array_merge(
-            [
-                'vehicles'   => $vehicles,
-                'page'       => $page,
-                'totalPages' => $totalPages,
-                'offset'     => $offset
-            ],
-            $f
-        ));
+        // 5) On passe tout à la vue
+        $this->view('vehicles/index', [
+            'vehicles'   => $vehicles,
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'offset'     => $offset,
+            // pour préremplir les cases cochées dans index.php
+            'type'       => $fType,
+            'fabricant'  => $fFabricant,
+            'model'      => $fModel,
+            'color'      => $fColor,
+            'seats'      => $fSeats,
+            'km_max'     => $fKmMax,
+        ]);
     }
 
     /**
      * Panneau admin : liste TOTALE des véhicules, avec overlay “En réparation”
-     * pour ceux qui ont une maintenance active.
+     * pour ceux ayant maintenance active.
      */
     public function adminPanel(): void
     {
@@ -71,16 +89,16 @@ class VehicleController extends Controller
         $limit  = 5;
 
         // 1) On récupère tous les véhicules
-        $allVehicles = (new Vehicle())->getAll(); // renvoie tous les enregistrements de vehicles
+        $allVehicles = (new Vehicle())->getAll();
 
-        // 2) On récupère le tableau des vehicle_id qui sont en maintenance active
+        // 2) On récupère les IDs en maintenance active
         $pdo = (new \App\Config\Database())->getConnection();
         $stmt = $pdo->query("
             SELECT vehicle_id
             FROM maintenance
             WHERE is_active = TRUE
         ");
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $inMaintenance = [];
         foreach ($rows as $r) {
             $inMaintenance[(int)$r['vehicle_id']] = true;
@@ -92,7 +110,7 @@ class VehicleController extends Controller
         $offset     = ($page - 1) * $limit;
         $vehicles   = array_slice($allVehicles, $offset, $limit, true);
 
-        // 4) On passe $inMaintenance à la vue pour qu’elle affiche l’overlay sur chaque ligne
+        // 4) On transmet à la vue
         $this->view('vehicles/admin', [
             'vehicles'      => $vehicles,
             'page'          => $page,
