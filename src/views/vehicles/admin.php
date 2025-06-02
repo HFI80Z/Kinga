@@ -14,6 +14,8 @@
     </div>
     <nav class="flex-1 px-2 space-y-1">
       <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">Liste Véhicules</a>
+      <a href="/admin/maintenance" class="block px-4 py-2 rounded hover:bg-gray-700">Maintenances</a>
+      <a href="/admin/repairers" class="block px-4 py-2 rounded hover:bg-gray-700">Réparateurs</a>
       <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">Commandes</a>
       <a href="/admin/users" class="block px-4 py-2 rounded hover:bg-gray-700">Utilisateurs</a>
     </nav>
@@ -25,7 +27,7 @@
   <!-- MAIN CONTENT -->
   <main class="flex-1 bg-gray-100 overflow-auto p-6">
 
-    <!-- TITLE + ADD FORM -->
+    <!-- TITRE + AJOUTER UN VÉHICULE -->
     <section class="space-y-6">
       <h1 class="text-2xl font-bold text-gray-800">Panneau Administrateur – Véhicules</h1>
 
@@ -92,12 +94,12 @@
       </form>
     </section>
 
-    <!-- TABLE + PAGINATION -->
+    <!-- TABLEAU + PAGINATION -->
     <section class="mt-8">
       <div class="bg-white rounded-lg shadow flex flex-col overflow-hidden">
 
         <!-- Tableau -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto relative">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -114,29 +116,44 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <?php $i = 0; foreach ($vehicles as $v): $i++; ?>
-              <tr>
-                <td class="px-6 py-4"><?= $offset + $i ?></td>
-                <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= htmlspecialchars($v['type'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= htmlspecialchars($v['modele'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4 text-center"><?= (int)$v['nb_sieges'] ?></td>
-                <td class="px-6 py-4"><?= number_format((int)$v['km'],0,' ',' ') ?></td>
-                <td class="px-6 py-4 space-x-2">
-                  <!-- Modifier -->
-                  <a href="/vehicle/edit?id=<?= (int)$v['id'] ?>"
-                     class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg">
-                    Modifier
-                  </a>
-                  <!-- Supprimer -->
-                  <a href="/vehicle/delete?id=<?= (int)$v['id'] ?>"
-                     onclick="return confirm('Supprimer ce véhicule ?');"
-                     class="inline-block bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded-lg">
-                    Supprimer
-                  </a>
-                </td>
-              </tr>
+                <?php $vid = (int)$v['id']; ?>
+                <tr class="relative">
+                  <td class="px-6 py-4"><?= $offset + $i ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($v['immatriculation'], ENT_QUOTES) ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($v['type'], ENT_QUOTES) ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($v['fabricant'], ENT_QUOTES) ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($v['modele'], ENT_QUOTES) ?></td>
+                  <td class="px-6 py-4"><?= htmlspecialchars($v['couleur'], ENT_QUOTES) ?></td>
+                  <td class="px-6 py-4 text-center"><?= (int)$v['nb_sieges'] ?></td>
+                  <td class="px-6 py-4"><?= number_format((int)$v['km'], 0, ' ', ' ') ?></td>
+                  <td class="px-6 py-4 space-x-2">
+                    <!-- Modifier -->
+                    <a href="/vehicle/edit?id=<?= $vid ?>"
+                       class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg">
+                      Modifier
+                    </a>
+                    <!-- Supprimer -->
+                    <a href="/vehicle/delete?id=<?= $vid ?>"
+                       onclick="return confirm('Supprimer ce véhicule ?');"
+                       class="inline-block bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded-lg">
+                      Supprimer
+                    </a>
+                    <!-- Mettre en maintenance si pas déjà en maintenance -->
+                    <?php if (!isset($inMaintenance[$vid])): ?>
+                      <a href="/admin/maintenance/form?vehicle_id=<?= $vid ?>"
+                         class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg">
+                        Mettre en maintenance
+                      </a>
+                    <?php endif; ?>
+                  </td>
+
+                  <?php if (isset($inMaintenance[$vid])): ?>
+                    <!-- Overlay “En réparation” -->
+                    <td class="absolute inset-0 p-0 m-0 bg-gray-300 bg-opacity-75 flex items-center justify-center" colspan="9">
+                      <span class="text-red-600 font-bold text-lg">En réparation</span>
+                    </td>
+                  <?php endif; ?>
+                </tr>
               <?php endforeach; ?>
             </tbody>
           </table>
