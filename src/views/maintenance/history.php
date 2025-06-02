@@ -29,14 +29,6 @@
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Réparateurs
       </a>
-      <a href="/admin/orders"
-         class="block px-4 py-2 rounded hover:bg-gray-700">
-        Commandes
-      </a>
-      <a href="/admin/users"
-         class="block px-4 py-2 rounded hover:bg-gray-700">
-        Utilisateurs
-      </a>
     </nav>
     <div class="px-6 py-4 border-t border-gray-700">
       <a href="/logout" class="block text-red-400 hover:text-red-300">
