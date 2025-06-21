@@ -6,8 +6,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
 
-  <!-- SIDEBAR (identique) -->
+  
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
     <div class="px-6 py-4 flex items-center">
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
@@ -37,10 +38,10 @@
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  
   <main class="flex-1 bg-gray-100 overflow-auto p-6">
 
-    <!-- TITRE + Bouton “Effacer historique” -->
+    
     <section class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Historique des maintenances</h1>
       <form action="/admin/maintenance/history/clear" method="post"
@@ -52,7 +53,7 @@
       </form>
     </section>
 
-    <!-- TABLEAU HISTORIQUE -->
+    
     <div class="bg-white rounded-lg shadow overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -98,7 +99,7 @@
       </table>
     </div>
 
-    <!-- PAGINATION -->
+    
     <div class="flex justify-between items-center mt-4">
       <?php if ($page > 1): ?>
         <a href="?page=<?= $page - 1 ?>"

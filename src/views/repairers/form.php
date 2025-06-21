@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
 
   <!-- HEADER MINIMALISTE -->
   <header class="bg-white shadow">

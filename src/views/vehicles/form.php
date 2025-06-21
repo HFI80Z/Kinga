@@ -6,6 +6,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
   <!-- Header minimaliste -->
   <header class="bg-white shadow">
     <div class="container mx-auto px-6 py-4 flex items-center">
