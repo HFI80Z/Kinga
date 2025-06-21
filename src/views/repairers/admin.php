@@ -17,6 +17,7 @@
       <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">Liste Véhicules</a>
       <!-- Lien vers le module maintenance -->
       <a href="/admin/maintenance" class="block px-4 py-2 rounded hover:bg-gray-700">Maintenances</a>
+      <a href="/admin/parts/inventory" class="block px-4 py-2 rounded hover:bg-gray-700">Inventaire pièces</a>
       <!-- Lien vers le module réparateurs (actif) -->
       <a href="/admin/repairers" class="block px-4 py-2 rounded bg-gray-700">Réparateurs</a>
     </nav>

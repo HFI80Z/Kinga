@@ -7,7 +7,6 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <!-- HEADER MINIMALISTE -->
   <header class="bg-white shadow">
     <div class="container mx-auto px-6 py-4 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-gray-800">Nouvelle Maintenance</h1>
@@ -19,7 +18,7 @@
     <div class="bg-white p-6 rounded-lg shadow max-w-3xl mx-auto">
       <form action="/maintenance/store" method="post" class="space-y-6">
 
-        <!-- Sélection du véhicule (si vehicle déjà passé en GET, on l’affiche en readonly) -->
+        <!-- Véhicule -->
         <?php if (isset($vehicle) && $vehicle): ?>
           <input type="hidden" name="vehicle_id" value="<?= (int)$vehicle['id'] ?>">
           <div>
@@ -34,12 +33,7 @@
             <select name="vehicle_id" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">-- Sélectionner un véhicule --</option>
-              <?php
-                // On récupère la liste des véhicules non en maintenance (pour ne pas en rajouter plusieurs fois)
-                // Pour cela, vous pouvez faire dans le contrôleur un appel à VehicleModel::getAvailableForMaintenance()
-                // Ici, je suppose que le contrôleur a passé un tableau `$availableVehicles` dans la vue.
-                foreach ($availableVehicles as $v):
-              ?>
+              <?php foreach ($availableVehicles as $v): ?>
                 <option value="<?= (int)$v['id'] ?>">
                   <?= htmlspecialchars($v['immatriculation'] . ' – ' . $v['modele'], ENT_QUOTES) ?>
                 </option>
@@ -48,42 +42,59 @@
           </div>
         <?php endif; ?>
 
-        <!-- Sélection du réparateur -->
+        <!-- Réparateur -->
         <div>
           <label class="block text-gray-700 mb-1">Réparateur <span class="text-red-500">*</span></label>
           <select name="repairer_id" required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">-- Sélectionner un réparateur --</option>
             <?php foreach ($repairers as $r): ?>
-              <option value="<?= (int)$r['id'] ?>">
-                <?= htmlspecialchars($r['name'], ENT_QUOTES) ?>
-              </option>
+              <option value="<?= (int)$r['id'] ?>"><?= htmlspecialchars($r['name'], ENT_QUOTES) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
 
-        <!-- Raison de la maintenance -->
+        <!-- Service -->
         <div>
-          <label class="block text-gray-700 mb-1">Raison <span class="text-red-500">*</span></label>
-          <textarea name="reason" rows="3" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ex : Vidange moteur, problème de freins…"></textarea>
+          <label class="block text-gray-700 mb-1">Service <span class="text-red-500">*</span></label>
+          <select name="service_id" id="service-select" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+            <option value="">-- Choisir un service --</option>
+            <?php foreach ($services as $s): ?>
+              <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name'], ENT_QUOTES) ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
 
-        <!-- Pièces nécessaires (on peut en ajouter plusieurs) -->
+        <!-- Raison -->
+        <div>
+          <label class="block text-gray-700 mb-1">Raison <span class="text-red-500">*</span></label>
+          <select name="reason_id" id="reason-select" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+            <option value="">-- Choisir une raison --</option>
+          </select>
+        </div>
+
+        <!-- Pièces nécessaires -->
         <div id="parts-container" class="space-y-4">
           <label class="block text-gray-700 mb-1">Pièces nécessaires</label>
           <div class="space-y-2">
             <div class="grid grid-cols-3 gap-3 items-end">
               <div>
                 <label class="block text-sm text-gray-600">Nom de la pièce</label>
-                <input type="text" name="part_name[]" placeholder="Ex : Filtre à huile"
-                       class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="part_name[]" class="part-select mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  <option value="">-- Choisir une pièce --</option>
+                  <?php foreach ($parts as $p): ?>
+                    <option value="<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>" data-stock="<?= $p['stock'] ?>">
+                      <?= htmlspecialchars($p['name'] . ' (' . $p['stock'] . ')', ENT_QUOTES) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
               </div>
               <div>
                 <label class="block text-sm text-gray-600">Quantité</label>
                 <input type="number" name="quantity[]" min="1" value="1"
-                       class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="part-quantity mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
               </div>
               <div class="text-right">
                 <button type="button"
@@ -94,12 +105,13 @@
             </div>
           </div>
         </div>
+
         <button type="button" id="btn-add-part"
                 class="inline-block text-blue-600 hover:text-blue-800 font-semibold">
           + Ajouter une autre pièce
         </button>
 
-        <!-- Boutons d’action -->
+        <!-- Actions -->
         <div class="flex justify-between pt-4 border-t border-gray-200">
           <a href="/admin/maintenance"
              class="inline-block px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg">
@@ -115,42 +127,63 @@
   </main>
 
   <script>
-    // JS minimal pour cloner le bloc “pièce” quand on clique sur “+ Ajouter une autre pièce”
-    document.getElementById('btn-add-part').addEventListener('click', function() {
-      const container = document.getElementById('parts-container');
-      // Récupérer le premier bloc existant (le template)
-      const firstBlock = container.querySelector('div.space-y-2 > div');
-      const clone = firstBlock.cloneNode(true);
-      // Vider les champs textes dans le clone
-      clone.querySelectorAll('input').forEach(i => {
-        if (i.name === 'quantity[]') {
-          i.value = '1';
-        } else {
-          i.value = '';
-        }
-      });
-      container.appendChild(clone);
-      // Re-attacher l’événement “Supprimer” sur le clone
-      attachRemoveListeners();
+    const services = <?= json_encode($services) ?>;
+    const serviceSelect = document.getElementById('service-select');
+    const reasonSelect = document.getElementById('reason-select');
+
+    serviceSelect.addEventListener('change', function () {
+      const selectedId = this.value;
+      reasonSelect.innerHTML = '<option value="">-- Choisir une raison --</option>';
+      const selectedService = services.find(s => s.id == selectedId);
+      if (selectedService && selectedService.reasons) {
+        selectedService.reasons.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r.id;
+          opt.textContent = r.label;
+          reasonSelect.appendChild(opt);
+        });
+      }
     });
 
-    function attachRemoveListeners() {
-      document.querySelectorAll('.btn-remove-part').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const row = btn.closest('div.grid');
-          // On ne supprime pas le dernier bloc (au moins un bloc doit rester)
-          const totalBlocks = document.querySelectorAll('#parts-container div.grid').length;
-          if (totalBlocks > 1) {
-            row.remove();
-          } else {
-            // Si on veut vider le premier
-            row.querySelectorAll('input').forEach(i => i.value = '');
+    function updateQuantityLimits() {
+      document.querySelectorAll('.part-select').forEach(select => {
+        select.addEventListener('change', () => {
+          const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'), 10) || 1;
+          const qtyInput = select.closest('.grid').querySelector('.part-quantity');
+          qtyInput.max = stock;
+          if (parseInt(qtyInput.value, 10) > stock) {
+            qtyInput.value = stock;
           }
         });
       });
     }
-    // Attacher dès l’ouverture
+
+    function attachRemoveListeners() {
+      document.querySelectorAll('.btn-remove-part').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const row = btn.closest('div.grid');
+          const total = document.querySelectorAll('#parts-container div.grid').length;
+          if (total > 1) row.remove();
+          else row.querySelectorAll('select, input').forEach(i => i.value = '');
+        });
+      });
+    }
+
+    document.getElementById('btn-add-part').addEventListener('click', function () {
+      const container = document.getElementById('parts-container');
+      const firstBlock = container.querySelector('div.space-y-2 > div');
+      const clone = firstBlock.cloneNode(true);
+      clone.querySelectorAll('select, input').forEach(i => {
+        if (i.tagName === 'INPUT') i.value = i.name === 'quantity[]' ? '1' : '';
+        if (i.tagName === 'SELECT') i.selectedIndex = 0;
+      });
+      container.querySelector('.space-y-2').appendChild(clone);
+      attachRemoveListeners();
+      updateQuantityLimits();
+    });
+
     attachRemoveListeners();
+    updateQuantityLimits();
   </script>
 </body>
 </html>

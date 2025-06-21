@@ -81,7 +81,7 @@
                 <td class="px-6 py-4"><?= htmlspecialchars($h['immatriculation'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($h['type'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($h['repairer_name'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= nl2br(htmlspecialchars($h['reason'], ENT_QUOTES)) ?></td>
+                <td class="px-6 py-4"><?= htmlspecialchars(($h['service'] ?? '') . ' – ' . ($h['reason'] ?? ''), ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= (new DateTime($h['created_at']))->format('d/m/Y H:i') ?></td>
                 <td class="px-6 py-4">
                   <?= 

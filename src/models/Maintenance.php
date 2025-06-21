@@ -8,60 +8,43 @@ use PDO;
 
 class Maintenance extends Model
 {
-    /**
-     * Renvoie toutes les maintenances actives (is_active = TRUE),
-     * avec véhicule (immatriculation, type, fabricant, modele) et réparateur (nom).
-     */
-    public function getAllActive(): array
+    public function getAllActiveWithReasonLabel(): array
     {
         $sql = "
             SELECT
-              m.id                 AS maintenance_id,
-              m.vehicle_id         AS vehicle_id,
-              v.immatriculation    AS immatriculation,
-              v.type               AS type,
-              v.fabricant          AS fabricant,
-              v.modele             AS modele,
-              m.repairer_id        AS repairer_id,
-              r.name               AS repairer_name,
-              m.reason             AS reason,
-              m.created_at         AS created_at
+              m.id,
+              m.vehicle_id,
+              v.immatriculation,
+              v.type,
+              r.name AS repairer_name,
+              sr.label AS reason_label,
+              m.created_at
             FROM maintenance m
-            JOIN vehicles v
-              ON v.id = m.vehicle_id
-            LEFT JOIN repairers r
-              ON r.id = m.repairer_id
+            JOIN vehicles v ON v.id = m.vehicle_id
+            LEFT JOIN repairers r ON r.id = m.repairer_id
+            LEFT JOIN service_reasons sr ON sr.id = m.reason_id
             WHERE m.is_active = TRUE
             ORDER BY m.created_at DESC
         ";
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Crée une nouvelle maintenance (avec is_active = TRUE, closed_at = NULL).
-     * Retourne l'ID créé.
-     */
     public function create(array $data): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO maintenance
-              (vehicle_id, repairer_id, reason, is_active)
-            VALUES
-              (:vid, :rid, :reason, TRUE)
+            INSERT INTO maintenance (vehicle_id, repairer_id, service_id, reason_id, is_active)
+            VALUES (:vid, :rid, :sid, :reason_id, TRUE)
             RETURNING id
         ");
         $stmt->execute([
-            ':vid'    => $data['vehicle_id'],
-            ':rid'    => $data['repairer_id'],
-            ':reason' => $data['reason'],
+            ':vid'       => $data['vehicle_id'],
+            ':rid'       => $data['repairer_id'],
+            ':sid'       => $data['service_id'],
+            ':reason_id' => $data['reason_id']
         ]);
         return (int)$stmt->fetchColumn();
     }
 
-    /**
-     * Clôture la maintenance d'ID $id : passe is_active=FALSE et closed_at = NOW().
-     */
     public function close(int $id): void
     {
         $stmt = $this->db->prepare("
@@ -73,45 +56,29 @@ class Maintenance extends Model
         $stmt->execute([':id' => $id]);
     }
 
-    /**
-     * Renvoie toutes les maintenances (actives ou fermées), avec
-     * véhicule (immatriculation, type, fabricant, modele),
-     * réparateur (nom), raison, created_at, closed_at.
-     */
-    public function getAllHistory(): array
+    public function getAllHistoryWithReasonLabel(): array
     {
         $sql = "
             SELECT
-              m.id              AS maintenance_id,
-              v.immatriculation AS immatriculation,
-              v.type            AS type,
-              v.fabricant       AS fabricant,
-              v.modele          AS modele,
-              r.name            AS repairer_name,
-              m.reason          AS reason,
-              m.created_at      AS created_at,
-              m.closed_at       AS closed_at
+              m.id,
+              v.immatriculation,
+              v.type,
+              r.name AS repairer_name,
+              sr.label AS reason_label,
+              m.created_at,
+              m.closed_at
             FROM maintenance m
-            JOIN vehicles v
-              ON v.id = m.vehicle_id
-            LEFT JOIN repairers r
-              ON r.id = m.repairer_id
+            JOIN vehicles v ON v.id = m.vehicle_id
+            LEFT JOIN repairers r ON r.id = m.repairer_id
+            LEFT JOIN service_reasons sr ON sr.id = m.reason_id
             ORDER BY m.created_at DESC
         ";
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Supprime TOUTES les maintenances (fermées ou en cours),
-     * ainsi que les pièces liées (maintenance_parts).
-     */
     public function clearAll(): void
     {
-        // 1) Supprimer toutes les pièces liées
         $this->db->exec("DELETE FROM maintenance_parts");
-
-        // 2) Supprimer toutes les maintenances
         $this->db->exec("DELETE FROM maintenance");
     }
 }

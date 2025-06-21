@@ -15,6 +15,7 @@
     <nav class="flex-1 px-2 space-y-1">
       <a href="/admin" class="block px-4 py-2 rounded hover:bg-gray-700">Liste Véhicules</a>
       <a href="/admin/maintenance" class="block px-4 py-2 rounded hover:bg-gray-700">Maintenances</a>
+      <a href="/admin/parts/inventory" class="block px-4 py-2 rounded hover:bg-gray-700">Inventaire pièces</a>
       <a href="/admin/repairers" class="block px-4 py-2 rounded hover:bg-gray-700">Réparateurs</a>
       <!-- Onglets supprimés : Commandes et Utilisateurs -->
       <!-- <a href="/admin/orders" class="block px-4 py-2 rounded hover:bg-gray-700">Commandes</a> -->

@@ -23,6 +23,10 @@
          class="block px-4 py-2 rounded bg-gray-700">
         Maintenances
       </a>
+      <a href="/admin/parts/inventory" 
+      class="block px-4 py-2 rounded hover:bg-gray-700">
+      Inventaire pièces
+      </a>
       <!-- Lien vers l’historique des maintenances -->
       <a href="/admin/maintenance/history"
          class="block px-4 py-2 rounded hover:bg-gray-700">
@@ -90,7 +94,7 @@
                 <td class="px-6 py-4"><?= htmlspecialchars($m['immatriculation'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($m['type'], ENT_QUOTES) ?></td>
                 <td class="px-6 py-4"><?= htmlspecialchars($m['repairer_name'], ENT_QUOTES) ?></td>
-                <td class="px-6 py-4"><?= nl2br(htmlspecialchars($m['reason'], ENT_QUOTES)) ?></td>
+                <td class="px-6 py-4"><?= nl2br(htmlspecialchars($m['reason_label'] ?? '', ENT_QUOTES)) ?></td>
                 <td class="px-6 py-4"><?= (new DateTime($m['created_at']))->format('d/m/Y H:i') ?></td>
                 <td class="px-6 py-4 space-x-2">
                   <!-- Bouton “Détails” (affiche les pièces nécessaires) -->
@@ -101,7 +105,7 @@
                   </button>
 
                   <!-- Bouton “Sortir de maintenance” -->
-                  <a href="/maintenance/close?id=<?= (int)$m['maintenance_id'] ?>"
+                  <a href="/maintenance/close?id=<?= (int)$m['id'] ?>"
                      onclick="return confirm('Sortir ce véhicule de la maintenance ?');"
                      class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg">
                     Sortir de maintenance
