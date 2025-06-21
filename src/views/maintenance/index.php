@@ -6,29 +6,30 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
 
-  <!-- SIDEBAR (identique aux autres vues admin, sans “Commandes” / “Utilisateurs”) -->
+  
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
     <div class="px-6 py-4 flex items-center">
       <a href="/"><img src="/assets/img/logo_kinga.png" alt="Kinga Logo" class="h-8"></a>
     </div>
     <nav class="flex-1 px-2 space-y-1">
-      <!-- Lien vers la liste des véhicules -->
+      
       <a href="/admin"
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Liste Véhicules
       </a>
-      <!-- Lien vers le module “Maintenances” (actif) -->
+      
       <a href="/admin/maintenance"
          class="block px-4 py-2 rounded bg-gray-700">
         Maintenances
       </a>
-      <!-- Lien vers l’historique des maintenances -->
+      
       <a href="/admin/maintenance/history"
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Historique
       </a>
-      <!-- Lien vers le module “Réparateurs” -->
+      
       <a href="/admin/repairers"
          class="block px-4 py-2 rounded hover:bg-gray-700">
         Réparateurs
@@ -41,13 +42,12 @@
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  
   <main class="flex-1 bg-gray-100 overflow-auto p-6">
 
-    <!-- TITRE -->
+  
     <section class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Panneau Admin – Maintenances</h1>
-      <!-- Vous pouvez décommenter ce bouton si vous souhaitez ajouter un lien vers le formulaire de création -->
       <!--
       <a href="/admin/maintenance/form"
          class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg">
@@ -56,7 +56,7 @@
       -->
     </section>
 
-    <!-- TABLEAU DES MAINTENANCES EN COURS (PAGE ACTUELLE) -->
+    
     <div class="bg-white rounded-lg shadow overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -80,7 +80,7 @@
           <?php else: ?>
             <?php 
               $i = 0; 
-              // Calculer le numéro absolu de la première ligne de la page :
+              
               $startIndex = ($page - 1) * 5;
               foreach ($maintenances as $m): 
                 $i++;
@@ -93,14 +93,14 @@
                 <td class="px-6 py-4"><?= nl2br(htmlspecialchars($m['reason'], ENT_QUOTES)) ?></td>
                 <td class="px-6 py-4"><?= (new DateTime($m['created_at']))->format('d/m/Y H:i') ?></td>
                 <td class="px-6 py-4 space-x-2">
-                  <!-- Bouton “Détails” (affiche les pièces nécessaires) -->
+                  
                   <button type="button"
                           class="btn-detail inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg"
                           data-parts='<?= json_encode($m['parts'], JSON_HEX_APOS|JSON_HEX_QUOT) ?>'>
                     Détails
                   </button>
 
-                  <!-- Bouton “Sortir de maintenance” -->
+                  
                   <a href="/maintenance/close?id=<?= (int)$m['maintenance_id'] ?>"
                      onclick="return confirm('Sortir ce véhicule de la maintenance ?');"
                      class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg">
@@ -114,7 +114,7 @@
       </table>
     </div>
 
-    <!-- PAGINATION : Précédent / Suivant -->
+    
     <div class="flex justify-between items-center mt-4">
       <?php if ($page > 1): ?>
         <a href="?page=<?= $page - 1 ?>"
@@ -139,14 +139,14 @@
 
   </main>
 
-  <!-- MODAL “Détails des pièces” -->
+  
   <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
   <div id="modal"
        class="hidden fixed inset-0 flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-lg">
       <h2 class="text-xl font-semibold mb-4">Pièces nécessaires</h2>
       <div id="modalContent" class="space-y-2 text-gray-700">
-        <!-- Contenu injecté par JavaScript -->
+        
       </div>
       <div class="mt-6 flex justify-end">
         <button id="modalClose" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Fermer</button>
@@ -155,7 +155,7 @@
   </div>
 
   <script>
-    // Affiche le modal et injecte la liste des pièces pour la maintenance
+    
     const overlayM = document.getElementById('overlay'),
           modalM   = document.getElementById('modal'),
           contentM = document.getElementById('modalContent'),

@@ -6,11 +6,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
 <?php
   use App\Core\Auth;
 
-  // On récupère les filtres envoyés en GET
-  // type, fabricant et color sont des tableaux (cases à cocher)
   $filter = [
     'type'      => $_GET['type']      ?? [],
     'fabricant' => $_GET['fabricant'] ?? [],
@@ -20,7 +19,6 @@
     'km_max'    => (int)($_GET['km_max'] ?? 0),
   ];
 
-  // S’assurer que ce sont bien des tableaux
   if (!is_array($filter['type'])) {
       $filter['type'] = $filter['type'] !== '' ? [ $filter['type'] ] : [];
   }
@@ -31,7 +29,6 @@
       $filter['color'] = $filter['color'] !== '' ? [ $filter['color'] ] : [];
   }
 ?>
-<!-- HEADER -->
 <header class="bg-white shadow-sm">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
     <div class="flex items-center space-x-4">
@@ -62,7 +59,6 @@
   </div>
 </header>
 
-<!-- OVERLAY & SIDEBAR FILTRES -->
 <div id="filterOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-20"></div>
 <aside id="filterSidebar"
        class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-30">
@@ -77,7 +73,7 @@
   </div>
 
   <form method="get" action="" class="p-4 space-y-5 overflow-y-auto h-full">
-    <!-- FILTRE : TYPE (checkbox group) -->
+    
     <div>
       <span class="block text-sm font-medium text-gray-700">Type</span>
       <div class="mt-2 space-y-1">
@@ -95,7 +91,7 @@
       </div>
     </div>
 
-    <!-- FILTRE : FABRICANT (checkbox group) -->
+    
     <div>
       <span class="block text-sm font-medium text-gray-700">Fabricant</span>
       <div class="mt-2 space-y-1">
@@ -113,7 +109,7 @@
       </div>
     </div>
 
-    <!-- FILTRE : MODÈLE (texte libre) -->
+    
     <div>
       <label class="block text-sm text-gray-700">Modèle</label>
       <input type="text" name="model" value="<?= htmlspecialchars($filter['model'], ENT_QUOTES) ?>"
@@ -121,7 +117,7 @@
              placeholder="ex. Corolla">
     </div>
 
-    <!-- FILTRE : COULEUR (checkbox group) -->
+    
     <div>
       <span class="block text-sm font-medium text-gray-700">Couleur</span>
       <div class="mt-2 space-y-1">
@@ -139,14 +135,14 @@
       </div>
     </div>
 
-    <!-- FILTRE : NB SIÈGES (nombre) -->
+    
     <div>
       <label class="block text-sm text-gray-700">Nb sièges</label>
       <input type="number" name="seats" min="1" value="<?= $filter['seats'] ?>"
              class="mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500">
     </div>
 
-    <!-- FILTRE : KM MAX (slider) -->
+    
     <div>
       <label class="block text-sm text-gray-700">
         KM ≤ <span id="kmValue" class="font-semibold"><?= $filter['km_max'] ?></span>
@@ -161,7 +157,7 @@
       </div>
     </div>
 
-    <!-- BOUTONS Rechercher / Réinitialiser -->
+    
     <div class="pt-4 border-t space-y-2">
       <button type="submit"
               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg text-center">
@@ -175,13 +171,13 @@
   </form>
 </aside>
 
-<!-- MAIN CONTENT -->
+
 <main class="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col">
   <?php if (empty($vehicles)): ?>
     <p class="text-center text-gray-600">Aucun véhicule trouvé.</p>
   <?php else: ?>
     <div class="bg-white rounded-lg shadow flex flex-col overflow-hidden">
-      <!-- TABLEAU -->
+      
       <div class="overflow-x-auto flex-1">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-100">
@@ -226,7 +222,7 @@
         </table>
       </div>
 
-      <!-- PAGINATION STICKY -->
+      
       <div class="mt-6 sticky bottom-0 bg-white flex justify-between items-center px-6 py-4">
         <?php if ($page > 1): ?>
           <a href="?page=<?= $page - 1 ?>"
@@ -248,7 +244,7 @@
   <?php endif; ?>
 </main>
 
-<!-- MODAL PUBLIC -->
+
 <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 <div id="modal"
      class="hidden fixed inset-0 flex items-center justify-center z-50">

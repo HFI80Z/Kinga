@@ -6,6 +6,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-center">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
   <div class="bg-white shadow-lg rounded-lg w-full max-w-md p-8">
     <!-- Logo + titre -->
     <div class="text-center mb-6">

@@ -6,6 +6,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex h-screen overflow-hidden font-sans">
+  <?php include __DIR__ . '/../partials/lang_toggle.php'; ?>
 
   <!-- SIDEBAR -->
   <aside class="w-64 bg-gray-800 text-gray-100 flex-shrink-0 flex flex-col">
